@@ -1,0 +1,61 @@
+{
+  "name": "cytyflix-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon",
+    "start": "node ./dist/server.js",
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prettier": "prettier --ignore-path .gitignore --check \"./src/**/*.+(js|ts|json)\"",
+    "prettier:fix": "prettier --write src",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky",
+    "run:spin-up": "ts-node scripts/0_origin.ts spin-up",
+    "run:script": "ts-node -r tsconfig-paths/register scripts/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.16.1",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.10.1",
+    "winston": "^3.19.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^25.9.1",
+    "eslint": "^10.4.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.5",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.8.3",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.17",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^6.0.3"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint",
+      "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\""
+    ],
+    "*.{json,yml,yaml,md}": [
+      "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\""
+    ]
+  }
+}
