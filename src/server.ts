@@ -1,29 +1,24 @@
-import express, { type Request, type Response } from "express";
-import cors from "cors";
+import "reflect-metadata" // to allow decorators work well (typeorm)
+import env from "@/configs/env.config"
+import { connectDB } from "@/infrastructure/database/connect.db"
+import { app } from "./app";
 
-const app = express();
-const port = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || env.PORT;
 
-app.use(cors());
-app.use(express.json());
+async function bootstrap() {
+  await connectDB(); // initialize DB
 
-app.get('/', (req: Request, res: Response) => {
-    console.log(req)
-    res.send("Hello");
-});
+  app.listen(PORT, (err) => {
+    if (err) {
+        console.log(`Failed to start DB - Shutting down`)
+    }
+    console.log(`Server running on ${PORT}`);
+  })
+}
 
-app.post('/people', (req: Request, res: Response) => {
-    const firstName: string = (req.body.firstName || "").trim();
-    const lastName: string = (req.body.lastName || "").trim();
 
-    res.json({ firstName, lastName });
-});
 
-app.get('/people/:id', (req: Request, res: Response) => {
-    const id = req.params.id;
-    res.send(`Records for id: ${id}`);
-});
 
-app.listen(port, () => {
-    console.log(`Application is running at http://localhost:${port}`);
-})
+
+
+bootstrap();
