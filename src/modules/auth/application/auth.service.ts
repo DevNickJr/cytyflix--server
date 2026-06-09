@@ -1,34 +1,44 @@
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { User } from "@/modules/users/domain/user";
 import { UserRepository } from "@/modules/users/domain/user.repository";
-import { CreateUserDTO } from "./schemas/user.schema";
+import { CreateUserDTO } from "./schemas/auth.schema";
 
-export class UserService {
+export class AuthService {
   constructor(private readonly userRepo: UserRepository) {}
 
-  async createUser(dto: CreateUserDTO) {
+  async register(dto: CreateUserDTO) {
     const existing = await this.userRepo.findByEmail(dto.email);
     if (existing) throw new Error("User already exists");
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     const user = new User(
       crypto.randomUUID(),
       dto.email,
-      dto.password,
-      dto.name
+      hashedPassword 
     );
 
     return this.userRepo.create(user);
   }
 
-  async getUser(id: string) {
-    return this.userRepo.findById(id);
+  async login(dto: CreateUserDTO) {
+    const user = await this.userRepo.findByEmail(dto.email);
+
+    if (!user) {
+      throw new Error("Invalid credentials");
+    }
+
+    const passwordMatches = await bcrypt.compare(dto.password, user.password);
+    
+    if (!passwordMatches) {
+      throw new Error("Invalid credentials");
+    }
+
+    return {
+      userId: user.id,
+      email: user.email,
+      // return token/session (next step)
+    };
   }
-
-//   async updateUser(id: string, dto: UpdateUserDTO) {
-//     const user = await this.userRepo.findById(id);
-//     if (!user) throw new Error("User not found");
-
-//     user.updateProfile(dto.name);
-
-//     return this.userRepo.update(user);
-//   }
 }
