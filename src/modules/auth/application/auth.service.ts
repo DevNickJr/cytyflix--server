@@ -2,7 +2,11 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { User } from "@/modules/users/domain/user";
 import { UserRepository } from "@/modules/users/domain/user.repository";
-import { CreateUserDTO } from "./schemas/auth.schema";
+import { CreateUserDTO, LoginUserDTO } from "./schemas/auth.schema";
+import { RolesEnum } from "@/shared/interfaces";
+import logger from "@/shared/utils/logger";
+import CustomError from "@/shared/utils/custom-error";
+import { signJWT, verifyJWT } from "@/shared/utils/auth";
 
 export class AuthService {
   constructor(private readonly userRepo: UserRepository) {}
@@ -22,7 +26,7 @@ export class AuthService {
     return this.userRepo.create(user);
   }
 
-  async login(dto: CreateUserDTO) {
+  async login(dto: LoginUserDTO) {
     const user = await this.userRepo.findByEmail(dto.email);
 
     if (!user) {
@@ -35,10 +39,54 @@ export class AuthService {
       throw new Error("Invalid credentials");
     }
 
+    if (!user.isVerified) 
+      throw new Error("Account not verified");
+
+  if (!Object.values(RolesEnum).includes(user.role)) {
+    logger.error(`Malicious user detected. id: ${user.id}`);
+    throw new CustomError('User is Unauthorized', 401);
+  }
+
+  const { access, refresh } = signJWT({
+    user: {
+      id: user.id.toString(),
+      role: user.role,
+      email: user.email,
+    },
+    rememberMe: dto.rememberMe
+  });
+
     return {
       userId: user.id,
       email: user.email,
-      // return token/session (next step)
+      accessToken: access,
+      refeshToken: refresh      
     };
   }
+
+  async refreshToken ({
+    refreshToken,
+  }: {
+    refreshToken: string;
+  }) {
+    const decoded = verifyJWT(refreshToken);
+    const user = await this.userRepo.findById(decoded.id);
+
+    if (!user)
+      throw new CustomError('Unauthorized access: User does not exist', 401);
+
+    if (!user.isVerified) throw new CustomError('User not verified');
+    const { access, refresh } = signJWT({
+      user: {
+        id: user.id.toString(),
+        role: user.role,
+        email: user.email,
+      },
+    });
+
+    return {
+      accessToken: access,
+      refreshToken: refresh,
+    };
+  };
 }

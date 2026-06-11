@@ -1,6 +1,6 @@
 import { User } from "@/modules/users/domain/user";
-import { UserRepository } from "@/modules/users/domain/user.repository";
-import { CreateUserDTO } from "./schemas/user.schema";
+import { UserRepository } from "@/modules/users/contracts/user.interfaces";
+import { CreateUserDTO } from "@/modules/auth/contracts/auth.schemas";
 
 export class UserService {
   constructor(private readonly userRepo: UserRepository) {}

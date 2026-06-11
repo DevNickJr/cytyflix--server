@@ -7,8 +7,6 @@ export class UserMapper {
       entity.id,
       entity.email,
       entity.password,
-      entity.name,
-      entity.createdAt
     );
   }
 
@@ -18,7 +16,6 @@ export class UserMapper {
     entity.id = user.id;
     entity.email = user.email;
     entity.password = user.password;
-    entity.name = user.name;
     entity.createdAt = user.createdAt;
 
     return entity;

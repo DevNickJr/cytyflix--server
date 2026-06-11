@@ -1,5 +1,5 @@
 import { Repository } from "typeorm";
-import { UserRepository } from "@/modules/users/domain/user.repository";
+import { UserRepository } from "@/modules/users/contracts/user.interfaces";
 import { User } from "@/modules/users/domain/user";
 import { UserOrmEntity } from "./user.orm-entity";
 import { UserMapper } from "./user.mapper";

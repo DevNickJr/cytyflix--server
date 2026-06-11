@@ -12,8 +12,8 @@ export class UserOrmEntity {
   password!: string;
 
   @Column()
-  name!: string;
+  createdAt!: Date;
 
   @Column()
-  createdAt!: Date;
+  updatedAt!: Date;
 }

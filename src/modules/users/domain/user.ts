@@ -1,10 +1,12 @@
+import { RolesEnum } from "@/shared/interfaces";
 
 export class User {
   constructor(
     public readonly id: string,
     public email: string,
     public password: string,
-    public role: 'user' | 'agent' | 'admin' = 'user',
+    public role: RolesEnum = RolesEnum.USER,
+    public isVerified: boolean = false,
     public profile?: UserProfile,
     public createdAt: Date = new Date(),
     public updatedAt: Date = new Date()
