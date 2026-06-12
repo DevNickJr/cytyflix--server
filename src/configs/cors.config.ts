@@ -34,9 +34,6 @@ export const corsOptions = {
         console.error(`Blocked by CORS: ${origin}`);
         callback(new Error('Not allowed by CORS'));
       }
-
-      console.error(`Blocked by CORS: ${origin}`); // Debug log for blocked origins
-      callback(new Error('Not allowed by CORS'));
     }
   },
   preflightContinue: true,

@@ -16,7 +16,12 @@ export class UserRepositoryImpl implements UserRepository {
   }
 
   async findById(id: string): Promise<User | null> {
-    const entity = await this.ormRepo.findOne({ where: { id } });
+    const entity = await this.ormRepo.findOne({
+      where: { id },
+      relations: {
+        profile: true
+      }
+    });
     if (!entity) return null;
 
     return UserMapper.toDomain(entity);

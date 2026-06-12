@@ -69,19 +69,21 @@ The system is designed for:
 # Project Structure
 
 ```
-cytyflix/
+cytyflix--server/
 │
-├── client/
-├── server/
-│   ├── modules/
-        ├── models/
-        ├── controllers/
-        ├── services/
-        ├── repositories/
-│   ├── middleware/
-│   ├── routes/
-│   └── utils/
-│
+├── src/
+        ├── configs/
+        ├── infrastructure/
+        ├── modules/
+                ├── auth/
+                        ├── contracts/
+                        ├── applications/
+                        ├── domain/
+                        ├── infrastructure/
+                        ├── presentation/
+        ├── shared/
+                ├── middlewares/
+                └── utils/
 ├── docs/
 ├── docker/
 └── scripts/

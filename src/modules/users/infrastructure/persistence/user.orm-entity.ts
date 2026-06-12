@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne } from "typeorm";
+import { UserProfileOrmEntity } from "./user-profile.orm-entity";
+import { RolesEnum } from "@/shared/interfaces";
 
 @Entity("users")
 export class UserOrmEntity {
@@ -11,9 +13,23 @@ export class UserOrmEntity {
   @Column()
   password!: string;
 
-  @Column()
+  @Column({ 
+    // type: "enum",
+    // enum: RolesEnum,
+    default: RolesEnum.RENT_SEEKER 
+  })
+  role!: string;
+  // role!: RolesEnum;
+
+  @Column({ default: false })
+  isVerified!: boolean;
+
+  @OneToOne(() => UserProfileOrmEntity, profile => profile.user, { cascade: true, eager: true })
+  profile?: UserProfileOrmEntity;
+
+  @CreateDateColumn()
   createdAt!: Date;
 
-  @Column()
+  @UpdateDateColumn()
   updatedAt!: Date;
 }

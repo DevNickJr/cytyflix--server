@@ -51,14 +51,15 @@ export default function preRouteMiddleware(app: Express) {
   app.use(cookieParser());
   app.use(express.urlencoded({ extended: false })); // parses form submissions
 
-  // app.use((req, res, next) => {
-  //   Object.defineProperty(req, 'query', {
-  //     ...Object.getOwnPropertyDescriptor(req, 'query'),
-  //     value: req.query,
-  //     writable: true,
-  //   });
-  //   next();
-  // });
+  // extends the requestAnimationFrame.query object with a setter
+  app.use((req, res, next) => {
+    Object.defineProperty(req, 'query', {
+      ...Object.getOwnPropertyDescriptor(req, 'query'),
+      value: req.query,
+      writable: true,
+    });
+    next();
+  });
 
   // Middleware to conditionally apply JSON parsing
   app.use((req, res, next) => {

@@ -1,23 +1,47 @@
+import { Request, Response, NextFunction } from "express";
 import { UserService } from "../application/user.service";
+import CustomError from "@/shared/utils/custom-error";
 
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  create = async (req: any, res: any) => {
-    const user = await this.userService.createUser(req.body);
-    return res.json(user);
+  create = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = await this.userService.createUser(req.body);
+      res.status(201).json({ success: true, data: user });
+    } catch (error) {
+      next(error);
+    }
   };
 
-  get = async (req: any, res: any) => {
-    const user = await this.userService.getUser(req.params.id);
-    return res.json(user);
+  get = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = await this.userService.getUser(req.params.id as string);
+      if (!user) throw new CustomError("User not found", 404);
+      res.json({ success: true, data: user });
+    } catch (error) {
+      next(error);
+    }
   };
 
-//   update = async (req: any, res: any) => {
-//     const user = await this.userService.updateUser(
-//       req.params.id,
-//       req.body
-//     );
-//     return res.json(user);
-//   };
+  getMe = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const profile = await this.userService.getProfile(req.user!.id);
+      res.json({ success: true, data: profile });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateProfile = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) throw new CustomError('User is not authorized', 403);
+
+      const user = await this.userService.updateProfile(userId, req.body);
+      res.json({ success: true, data: user });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

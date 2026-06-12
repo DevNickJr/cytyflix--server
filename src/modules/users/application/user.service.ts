@@ -1,6 +1,7 @@
-import { User } from "@/modules/users/domain/user";
+import { User, UserProfile } from "@/modules/users/domain/user";
 import { UserRepository } from "@/modules/users/contracts/user.interfaces";
 import { CreateUserDTO } from "@/modules/auth/contracts/auth.schemas";
+import { UpdateProfileDTO } from "@/modules/users/contracts/user.schemas";
 
 export class UserService {
   constructor(private readonly userRepo: UserRepository) {}
@@ -22,12 +23,37 @@ export class UserService {
     return this.userRepo.findById(id);
   }
 
-//   async updateUser(id: string, dto: UpdateUserDTO) {
-//     const user = await this.userRepo.findById(id);
-//     if (!user) throw new Error("User not found");
+  async getProfile(userId: string) {
+    const user = await this.userRepo.findById(userId);
+    if (!user) throw new Error("User not found");
 
-//     user.updateProfile(dto.name);
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      isVerified: user.isVerified,
+      profile: user.profile || null,
+      createdAt: user.createdAt,
+    };
+  }
 
-//     return this.userRepo.update(user);
-//   }
+  async updateProfile(userId: string, dto: UpdateProfileDTO) {
+    const user = await this.userRepo.findById(userId);
+    if (!user) throw new Error("User not found");
+
+    const currentProfile = user.profile || new UserProfile("", "", "");
+
+    user.profile = new UserProfile(
+      dto.firstName ?? currentProfile.firstName,
+      dto.lastName ?? currentProfile.lastName,
+      dto.phoneNumber ?? currentProfile.phoneNumber,
+      dto.bio ?? currentProfile.bio,
+      dto.preferredLocation ?? currentProfile.preferredLocation,
+      dto.budgetMin ?? currentProfile.budgetMin,
+      dto.budgetMax ?? currentProfile.budgetMax,
+      dto.profileImage ?? currentProfile.profileImage,
+    );
+
+    return this.userRepo.update(user);
+  }
 }
