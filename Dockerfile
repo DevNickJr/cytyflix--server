@@ -1,5 +1,6 @@
 # Use Node.js LTS version
-FROM node:20-alpine
+# FROM node:20-alpine
+FROM node:20-bookworm-slim
 
 # Install curl for health checks
 RUN apk add --no-cache curl
