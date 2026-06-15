@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { PropertyService } from "../application/property.service";
-import { SearchPropertyQuery, SearchPropertyQuerySchema } from "../contracts/property.schemas";
+import { SearchPropertyQuery } from "../contracts/property.schemas";
 import { PaginationQueryDTO } from "@/shared/schemas";
 
 export class PropertyController {

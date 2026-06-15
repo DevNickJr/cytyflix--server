@@ -52,7 +52,7 @@ export default function preRouteMiddleware(app: Express) {
   app.use(express.urlencoded({ extended: false })); // parses form submissions
 
   // extends the requestAnimationFrame.query object with a setter
-  app.use((req, res, next) => {
+  app.use((req, _res, next) => {
     Object.defineProperty(req, 'query', {
       ...Object.getOwnPropertyDescriptor(req, 'query'),
       value: req.query,
