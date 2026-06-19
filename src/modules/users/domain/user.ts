@@ -15,6 +15,7 @@ export class User {
 
 export class UserProfile {
   constructor(
+    public readonly id: string,
     public firstName: string,
     public lastName: string,
     public phoneNumber: string,

@@ -9,6 +9,7 @@ export class UserMapper {
 
     if (entity.profile) {
       profile = new UserProfile(
+        entity.profile.id,
         entity.profile.firstName || "",
         entity.profile.lastName || "",
         entity.profile.phoneNumber || "",
@@ -45,6 +46,7 @@ export class UserMapper {
 
     if (user.profile) {
       const profileEntity = new UserProfileOrmEntity();
+      profileEntity.id = user.profile.id;
       profileEntity.firstName = user.profile.firstName;
       profileEntity.lastName = user.profile.lastName;
       profileEntity.phoneNumber = user.profile.phoneNumber;
