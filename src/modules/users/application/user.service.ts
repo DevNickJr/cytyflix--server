@@ -44,7 +44,7 @@ export class UserService {
     const currentProfile = user.profile || new UserProfile("", "", "", "");
 
     user.profile = new UserProfile(
-      currentProfile.id ?? crypto.randomUUID(),
+      currentProfile.id || crypto.randomUUID(),
       dto.firstName ?? currentProfile.firstName,
       dto.lastName ?? currentProfile.lastName,
       dto.phoneNumber ?? currentProfile.phoneNumber,
