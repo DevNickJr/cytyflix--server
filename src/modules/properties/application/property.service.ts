@@ -25,7 +25,10 @@ export class PropertyService {
       dto.bedrooms,
       dto.bathrooms,
       dto.amenities,
-      dto.images,
+      dto.proofOfOwnership,
+      dto.interiorImages,
+      dto.exteriorImages,
+      dto.streetImages,
       true,
       false,
       ownerId,
@@ -66,7 +69,10 @@ export class PropertyService {
     if (dto.bedrooms !== undefined) property.bedrooms = dto.bedrooms;
     if (dto.bathrooms !== undefined) property.bathrooms = dto.bathrooms;
     if (dto.amenities !== undefined) property.amenities = dto.amenities;
-    if (dto.images !== undefined) property.images = dto.images;
+    if (dto.proofOfOwnership !== undefined) property.proofOfOwnership = dto.proofOfOwnership;
+    if (dto.interiorImages !== undefined) property.interiorImages = dto.interiorImages;
+    if (dto.exteriorImages !== undefined) property.exteriorImages = dto.exteriorImages;
+    if (dto.streetImages !== undefined) property.streetImages = dto.streetImages;
 
     return this.propertyRepo.update(property);
   }

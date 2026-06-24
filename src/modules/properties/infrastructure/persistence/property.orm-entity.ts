@@ -52,7 +52,16 @@ export class PropertyOrmEntity {
   amenities!: string[];
 
   @Column({ type: "jsonb", default: "[]" })
-  images!: string[];
+  proofOfOwnership!: string[];
+
+  @Column({ type: "jsonb", default: "[]" })
+  interiorImages!: string[];
+
+  @Column({ type: "jsonb", default: "[]" })
+  exteriorImages!: string[];
+
+  @Column({ type: "jsonb", default: "[]" })
+  streetImages!: string[];
 
   @Column({ default: true })
   isAvailable!: boolean;

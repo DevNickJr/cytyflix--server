@@ -44,4 +44,36 @@ export class UserController {
       next(error);
     }
   };
+
+  getAgents = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const result = await this.userService.getAgents(page, limit);
+      res.json({ success: true, ...result });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getAgent = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const agent = await this.userService.getAgent(req.params.id as string);
+      res.json({ success: true, data: agent });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  makeAdminOrAgent = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) throw new CustomError('User is not authorized', 403);
+
+      const user = await this.userService.updateRole(userId, req.body);
+      res.json({ success: true, data: user });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

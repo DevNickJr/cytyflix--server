@@ -17,7 +17,10 @@ export const CreatePropertySchema = z.object({
     bedrooms: z.number().int().min(0).default(1),
     bathrooms: z.number().int().min(0).default(1),
     amenities: z.array(z.string()).default([]),
-    images: z.array(z.string().url()).default([]),
+    proofOfOwnership: z.array(z.string().url()).min(1, "At least one proof of ownership image required"),
+    interiorImages: z.array(z.string().url()).min(1, "At least one interior image required"),
+    exteriorImages: z.array(z.string().url()).min(1, "At least one exterior image required"),
+    streetImages: z.array(z.string().url()).default([]),
   })
 });
 

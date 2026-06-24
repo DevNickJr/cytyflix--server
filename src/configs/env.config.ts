@@ -25,6 +25,15 @@ const envSchema = z.object({
     .default(36000),
 
   ALLOWED_HOSTS: z.string().optional(),
+
+  // Firebase
+  FIREBASE_PROJECT_ID: z.string().default(''),
+  FIREBASE_PRIVATE_KEY: z.string().default(''),
+  FIREBASE_CLIENT_EMAIL: z.string().default(''),
+
+  // Paystack
+  PAYSTACK_SECRET_KEY: z.string().default(''),
+  PAYSTACK_PUBLIC_KEY: z.string().default(''),
 });
 
 const parsed = envSchema.safeParse(process.env);

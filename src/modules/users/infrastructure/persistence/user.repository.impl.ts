@@ -1,6 +1,7 @@
 import { Repository } from "typeorm";
 import { UserRepository } from "@/modules/users/contracts/user.interfaces";
 import { User } from "@/modules/users/domain/user";
+import { PaginatedResult } from "@/modules/properties/contracts/property.interfaces";
 import { UserOrmEntity } from "./user.orm-entity";
 import { UserMapper } from "./user.mapper";
 
@@ -32,6 +33,24 @@ export class UserRepositoryImpl implements UserRepository {
     if (!entity) return null;
 
     return UserMapper.toDomain(entity);
+  }
+
+  async findByRole(role: string, page: number, limit: number): Promise<PaginatedResult<User>> {
+    const [entities, total] = await this.ormRepo.findAndCount({
+      where: { role },
+      order: { createdAt: "DESC" },
+      skip: (page - 1) * limit,
+      take: limit,
+      relations: { profile: true },
+    });
+
+    return {
+      data: entities.map(UserMapper.toDomain),
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async update(user: User): Promise<User> {

@@ -6,6 +6,10 @@ import { propertyRouter } from "@/modules/properties/property.module";
 import { savedListingRouter } from "@/modules/saved-listings/saved-listing.module";
 import { inquiryRouter } from "@/modules/inquiries/inquiry.module";
 import { notificationRouter } from "@/modules/notifications/notification.module";
+import { agentVerificationRouter } from "@/modules/agent-verifications/agent-verification.module";
+import { reviewRouter } from "@/modules/reviews/review.module";
+import { reportRouter, reportAdminRouter } from "@/modules/reports/report.module";
+import { bookingRouter } from "@/modules/bookings/booking.module";
 
 const V1 = '/api/v1'
 
@@ -16,4 +20,9 @@ export function registerRoutes(app: Express) {
   app.use(`${V1}/saved-listings`, savedListingRouter);
   app.use(`${V1}/inquiries`, inquiryRouter);
   app.use(`${V1}/notifications`, notificationRouter);
+  app.use(`${V1}/agent-verifications`, agentVerificationRouter);
+  app.use(`${V1}/properties`, reviewRouter);
+  app.use(`${V1}/reports`, reportAdminRouter);
+  app.use(`${V1}/properties`, reportRouter);
+  app.use(`${V1}/bookings`, bookingRouter);
 }
