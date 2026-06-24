@@ -13,6 +13,7 @@ export class PropertyMapper {
       entity.currency,
       entity.address,
       entity.city,
+      entity.lga,
       entity.state,
       entity.country,
       entity.latitude ? Number(entity.latitude) : undefined,
@@ -44,6 +45,7 @@ export class PropertyMapper {
     entity.currency = property.currency;
     entity.address = property.address;
     entity.city = property.city;
+    entity.lga = property.lga;
     entity.state = property.state;
     entity.country = property.country;
     entity.latitude = property.latitude;

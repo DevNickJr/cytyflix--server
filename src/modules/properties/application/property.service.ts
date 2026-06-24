@@ -18,6 +18,7 @@ export class PropertyService {
       dto.currency,
       dto.address,
       dto.city,
+      dto.lga,
       dto.state,
       dto.country,
       dto.latitude,
@@ -62,6 +63,7 @@ export class PropertyService {
     if (dto.currency !== undefined) property.currency = dto.currency;
     if (dto.address !== undefined) property.address = dto.address;
     if (dto.city !== undefined) property.city = dto.city;
+    if (dto.lga !== undefined) property.lga = dto.lga;
     if (dto.state !== undefined) property.state = dto.state;
     if (dto.country !== undefined) property.country = dto.country;
     if (dto.latitude !== undefined) property.latitude = dto.latitude;
@@ -88,6 +90,7 @@ export class PropertyService {
   async searchProperties(query: SearchPropertyQuery) {
     const filters: SearchFilters = {
       city: query.city,
+      lga: query.lga,
       state: query.state,
       propertyType: query.propertyType,
       listingType: query.listingType,

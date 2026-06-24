@@ -45,7 +45,7 @@ export class PropertyRepositoryImpl implements PropertyRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.ormRepo.delete(id);
+    await this.ormRepo.softDelete(id);
   }
 
   async search(filters: SearchFilters): Promise<PaginatedResult<Property>> {

@@ -10,6 +10,7 @@ export interface PaginatedResult<T> {
 
 export interface SearchFilters {
   city?: string;
+  lga?: string;
   state?: string;
   propertyType?: string;
   listingType?: string;

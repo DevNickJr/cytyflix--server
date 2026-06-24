@@ -9,6 +9,7 @@ export const CreatePropertySchema = z.object({
     price: z.number().positive(),
     currency: z.string().default("NGN"),
     address: z.string().min(5).max(500),
+    lga: z.string().min(2).max(100),
     city: z.string().min(2).max(100),
     state: z.string().min(2).max(100),
     country: z.string().default("Nigeria"),
@@ -35,6 +36,7 @@ export type UpdatePropertyDTO = z.infer<typeof UpdatePropertySchema>["body"];
 export const SearchPropertyQuerySchema = z.object({
   query: z.object({
     city: z.string().optional(),
+    lga: z.string().optional(),
     state: z.string().optional(),
     propertyType: z.enum(["apartment", "house", "studio", "duplex", "self_contain", "shared"]).optional(),
     listingType: z.enum(["rent", "shortlet"]).optional(),

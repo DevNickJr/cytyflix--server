@@ -23,6 +23,7 @@ export class Property {
     public currency: string = "NGN",
     public address: string,
     public city: string,
+    public lga: string,
     public state: string,
     public country: string = "Nigeria",
     public latitude?: number,

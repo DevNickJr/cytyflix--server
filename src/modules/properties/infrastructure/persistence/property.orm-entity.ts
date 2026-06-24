@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, DeleteDateColumn } from "typeorm";
 import { UserOrmEntity } from "@/modules/users/infrastructure/persistence/user.orm-entity";
 
 @Entity("properties")
@@ -28,7 +28,10 @@ export class PropertyOrmEntity {
   address!: string;
 
   @Column()
-  city!: string;
+  city!: string; // city or ward
+  
+  @Column({ nullable: false })
+  lga!: string;
 
   @Column()
   state!: string;
@@ -36,10 +39,10 @@ export class PropertyOrmEntity {
   @Column({ default: "Nigeria" })
   country!: string;
 
-  @Column({ type: "decimal", nullable: true })
+  @Column({ type: "decimal", precision: 10, scale: 7, nullable: true })
   latitude?: number;
 
-  @Column({ type: "decimal", nullable: true })
+  @Column({ type: "decimal", precision: 10, scale: 7, nullable: true })
   longitude?: number;
 
   @Column({ type: "int", default: 1 })
@@ -81,4 +84,7 @@ export class PropertyOrmEntity {
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @DeleteDateColumn() // Keeps data, hides it from normal queries
+  deletedAt!: Date;
 }

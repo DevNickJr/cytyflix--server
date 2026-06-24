@@ -52,7 +52,7 @@ export class BookingService {
       client.email,
       BOOKING_AMOUNT,
       reference,
-      { bookingId: saved.id, clientId, agentId: dto.agentId },
+      { bookingId: saved.id, clientId, agentId: dto.agentId, type: 'BOOKING' },
     );
 
     return {
