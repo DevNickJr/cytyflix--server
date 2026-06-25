@@ -1,11 +1,15 @@
 import { User, UserProfile } from "@/modules/users/domain/user";
 import { UserRepository, RolesEnum } from "@/modules/users/contracts/user.interfaces";
+import { PropertyRepository } from "@/modules/properties/contracts/property.interfaces";
 import { CreateUserDTO } from "@/modules/auth/contracts/auth.schemas";
 import { UpdateProfileDTO, UpdateRoleDTO } from "@/modules/users/contracts/user.schemas";
 import CustomError from "@/shared/utils/custom-error";
 
 export class UserService {
-  constructor(private readonly userRepo: UserRepository) {}
+  constructor(
+    private readonly userRepo: UserRepository,
+    private readonly propertyRepo: PropertyRepository,
+  ) {}
 
   async createUser(dto: CreateUserDTO) {
     const existing = await this.userRepo.findByEmail(dto.email);
@@ -24,6 +28,10 @@ export class UserService {
     return this.userRepo.findById(id);
   }
 
+  async getUserByEmail(email: string) {
+    return this.userRepo.findByEmail(email);
+  }
+  
   async getProfile(userId: string) {
     const user = await this.userRepo.findById(userId);
     if (!user) throw new Error("User not found");
@@ -85,6 +93,14 @@ export class UserService {
       profile: user.profile || null,
       createdAt: user.createdAt,
     };
+  }
+
+  async getAgentProperties(agentId: string, page: number, limit: number) {
+    const user = await this.userRepo.findById(agentId);
+    if (!user) throw new CustomError("Agent not found", 404);
+    if (user.role !== RolesEnum.AGENT) throw new CustomError("User is not an agent", 404);
+
+    return this.propertyRepo.findByOwnerId(agentId, page, limit);
   }
 
   async updateRole(userId: string, dto: UpdateRoleDTO) {

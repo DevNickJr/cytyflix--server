@@ -10,6 +10,7 @@ import { agentVerificationRouter } from "@/modules/agent-verifications/agent-ver
 import { reviewRouter } from "@/modules/reviews/review.module";
 import { reportRouter, reportAdminRouter } from "@/modules/reports/report.module";
 import { bookingRouter } from "@/modules/bookings/booking.module";
+import { analyticsRouter } from "@/modules/analytics/analytics.module";
 
 const V1 = '/api/v1'
 
@@ -25,4 +26,5 @@ export function registerRoutes(app: Express) {
   app.use(`${V1}/reports`, reportAdminRouter);
   app.use(`${V1}/properties`, reportRouter);
   app.use(`${V1}/bookings`, bookingRouter);
+  app.use(`${V1}/analytics`, analyticsRouter);
 }

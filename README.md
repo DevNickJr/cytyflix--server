@@ -306,3 +306,15 @@ Engineering principles:
 # License
 
 Internal/Private Project
+
+
+# TODO
+[ ] - aGENT PAGE, maybe a subdomain (so they will have something to share on socials that contains all their listings)
+[ ] - share feature to socials
+[ ] - Analytics, calculate views and other metrics (ratings, etc) and use for app baesed recommendation
+[ ] - personalized recommendations
+[ ] - auto description with AI
+[ ] - alerts, directly to mails
+[ ] - client testimonials on agents page
+[ ] - verified agent badge
+[ ] - Geospatial & map-based discovery (future)

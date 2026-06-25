@@ -24,6 +24,16 @@ export class UserController {
     }
   };
 
+  getByEmail = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = await this.userService.getUserByEmail(req.params.email as string);
+      if (!user) throw new CustomError("User not found", 404);
+      res.json({ success: true, data: user });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   getMe = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const profile = await this.userService.getProfile(req.user!.id);
@@ -60,6 +70,17 @@ export class UserController {
     try {
       const agent = await this.userService.getAgent(req.params.id as string);
       res.json({ success: true, data: agent });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getAgentProperties = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 12;
+      const result = await this.userService.getAgentProperties(req.params.id as string, page, limit);
+      res.json({ success: true, ...result });
     } catch (error) {
       next(error);
     }

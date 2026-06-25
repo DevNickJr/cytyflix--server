@@ -35,6 +35,31 @@ export const AuthGuard = async (
   }
 };
 
+export const OptionalAuthGuard = async (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token = extractFromCookie(req) || extractTokenFromHeader(req);
+    if (!token) return next();
+
+    const decoded = jwt.verify(token, env.JWT_SECRET) as AccessTokenPayload;
+    if (!decoded) return next();
+
+    const userRepo = AppDataSource.getRepository(UserOrmEntity);
+    const entity = await userRepo.findOne({ where: { id: decoded.id } });
+
+    if (entity) {
+      req.user = UserMapper.toDomain(entity);
+    }
+
+    next();
+  } catch {
+    next();
+  }
+};
+
 export const RoleGuard =
   (allowedRoles: RolesEnum[]) =>
   async (req: Request, _res: Response, next: NextFunction) => {
