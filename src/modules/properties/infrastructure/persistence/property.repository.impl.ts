@@ -3,6 +3,7 @@ import { PropertyRepository, PaginatedResult, SearchFilters } from "@/modules/pr
 import { Property } from "@/modules/properties/domain/property";
 import { PropertyOrmEntity } from "./property.orm-entity";
 import { PropertyMapper } from "./property.mapper";
+import { SearchByLocationQuery } from "@/modules/users/contracts/user.interfaces";
 
 export class PropertyRepositoryImpl implements PropertyRepository {
   constructor(
@@ -21,20 +22,20 @@ export class PropertyRepositoryImpl implements PropertyRepository {
     return PropertyMapper.toDomain(entity);
   }
 
-  async findByOwnerId(ownerId: string, page: number, limit: number): Promise<PaginatedResult<Property>> {
+  async findByOwnerId(ownerId: string, filters: SearchByLocationQuery): Promise<PaginatedResult<Property>> {
     const [entities, total] = await this.ormRepo.findAndCount({
       where: { ownerId },
-      order: { createdAt: "DESC" },
-      skip: (page - 1) * limit,
-      take: limit,
+      order: { createdAt: filters?.sortOrder === "ASC" ? "ASC" : "DESC" },
+      skip: (filters.page - 1) * filters.limit,
+      take: filters.limit,
     });
 
     return {
       data: entities.map(PropertyMapper.toDomain),
       total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
+      page: filters.page  ,
+      limit: filters.limit,
+      totalPages: Math.ceil(total / filters.limit),
     };
   }
 

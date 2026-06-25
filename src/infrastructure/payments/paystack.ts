@@ -35,13 +35,19 @@ export async function initializeTransaction(
   reference: string,
   metadata: Record<string, any> = {},
 ): Promise<PaystackInitResponse> {
-  const response = await paystackClient.post("/transaction/initialize", {
-    email,
-    amount: amount * 100, // Paystack uses kobo
-    reference,
-    metadata,
-  });
-  return response.data.data;
+  try {
+    const response = await paystackClient.post("/transaction/initialize", {
+      email,
+      amount: amount * 100, // Paystack uses kobo
+      reference,
+      metadata,
+    });
+    console.log({ resopnse: response.data });
+    return response.data.data;
+  } catch (error) {
+    console.error("Error initializing transaction:", error);
+    throw new Error("Failed to initialize transaction");
+  }
 }
 
 export async function verifyTransaction(reference: string): Promise<PaystackVerifyResponse> {

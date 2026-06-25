@@ -30,6 +30,16 @@ export class UserProfileOrmEntity {
   @Column({ nullable: true })
   profileImage?: string;
 
+  // Native Postgres string arrays
+  @Column("text", { array: true, default: [] })
+  operatingStates!: string[]; // e.g., ["Lagos", "Ogun"]
+
+  @Column("text", { array: true, default: [] })
+  operatingLgas!: string[];   // e.g., ["Eti-Osa", "Ikeja", "Abeokuta South"]
+
+  @Column("text", { array: true, default: [] })
+  operatingCities!: string[];  // e.g., ["Lagos", "Ikeja", "Abeokuta South"]
+
   @OneToOne(() => UserOrmEntity, user => user.profile)
   @JoinColumn()
   user!: UserOrmEntity;

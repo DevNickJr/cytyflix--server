@@ -21,7 +21,7 @@ export class UserOrmEntity {
   role!: string;
   // role!: RolesEnum;
 
-  @Column({ default: false })
+  @Column({ default: true }) // TODO: change this to false in production WHEN we set up email verification
   isVerified!: boolean;
 
   @OneToOne(() => UserProfileOrmEntity, profile => profile.user, { cascade: true, eager: true })

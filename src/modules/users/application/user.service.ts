@@ -1,5 +1,5 @@
 import { User, UserProfile } from "@/modules/users/domain/user";
-import { UserRepository, RolesEnum } from "@/modules/users/contracts/user.interfaces";
+import { UserRepository, RolesEnum, SearchByLocationQuery } from "@/modules/users/contracts/user.interfaces";
 import { PropertyRepository } from "@/modules/properties/contracts/property.interfaces";
 import { CreateUserDTO } from "@/modules/auth/contracts/auth.schemas";
 import { UpdateProfileDTO, UpdateRoleDTO } from "@/modules/users/contracts/user.schemas";
@@ -62,13 +62,16 @@ export class UserService {
       dto.budgetMin ?? currentProfile.budgetMin,
       dto.budgetMax ?? currentProfile.budgetMax,
       dto.profileImage ?? currentProfile.profileImage,
+      dto.operatingStates ?? currentProfile.operatingStates,
+      dto.operatingLgas ?? currentProfile.operatingLgas,
+      dto.operatingCities ?? currentProfile.operatingCities,
     );
 
     return this.userRepo.update(user);
   }
 
-  async getAgents(page: number, limit: number) {
-    const result = await this.userRepo.findByRole(RolesEnum.AGENT, page, limit);
+  async getAgents(query: SearchByLocationQuery) {
+    const result = await this.userRepo.findByRole(RolesEnum.AGENT, query);
     return {
       ...result,
       data: result.data.map((user) => ({
@@ -95,12 +98,16 @@ export class UserService {
     };
   }
 
-  async getAgentProperties(agentId: string, page: number, limit: number) {
+  async getAgentProperties(agentId: string, query: SearchByLocationQuery) {
+    console.log('Error trace 2', agentId)
+    
     const user = await this.userRepo.findById(agentId);
+    console.log('New Error trace 2')
     if (!user) throw new CustomError("Agent not found", 404);
     if (user.role !== RolesEnum.AGENT) throw new CustomError("User is not an agent", 404);
 
-    return this.propertyRepo.findByOwnerId(agentId, page, limit);
+    console.log('Error trace')
+    return this.propertyRepo.findByOwnerId(agentId, query);
   }
 
   async updateRole(userId: string, dto: UpdateRoleDTO) {

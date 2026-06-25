@@ -47,7 +47,7 @@ export class PropertyService {
   async getPropertiesByOwner(query: {
     ownerId: string, page: number, limit: number
   }) {
-    return this.propertyRepo.findByOwnerId(query.ownerId, query.page, query.limit);
+    return this.propertyRepo.findByOwnerId(query.ownerId, query);
   }
 
   async updateProperty(id: string, ownerId: string, dto: UpdatePropertyDTO) {

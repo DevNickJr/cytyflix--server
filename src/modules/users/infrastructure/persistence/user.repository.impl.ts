@@ -1,5 +1,5 @@
-import { Repository } from "typeorm";
-import { UserRepository } from "@/modules/users/contracts/user.interfaces";
+import { In, Raw, Repository } from "typeorm";
+import { SearchByLocationQuery, UserRepository } from "@/modules/users/contracts/user.interfaces";
 import { User } from "@/modules/users/domain/user";
 import { PaginatedResult } from "@/modules/properties/contracts/property.interfaces";
 import { UserOrmEntity } from "./user.orm-entity";
@@ -25,6 +25,10 @@ export class UserRepositoryImpl implements UserRepository {
     });
     if (!entity) return null;
 
+    console.log({
+      entity
+    })
+
     return UserMapper.toDomain(entity);
   }
 
@@ -35,21 +39,36 @@ export class UserRepositoryImpl implements UserRepository {
     return UserMapper.toDomain(entity);
   }
 
-  async findByRole(role: string, page: number, limit: number): Promise<PaginatedResult<User>> {
+  async findByRole(role: string, query: SearchByLocationQuery): Promise<PaginatedResult<User>> {
+    console.log({
+      query
+    })
     const [entities, total] = await this.ormRepo.findAndCount({
-      where: { role },
-      order: { createdAt: "DESC" },
-      skip: (page - 1) * limit,
-      take: limit,
+      where: { 
+        role,
+        profile: {
+          ...(query.state ? { operatingStates: Raw((alias) => `:state = ANY(${alias})`, { state: query.state }) } : {}),
+          ...(query.city ? { operatingCities: Raw((alias) => `:city = ANY(${alias})`, { city: query.city }) } : {}),
+          ...(query.lga ? { operatingLgas: Raw((alias) => `:lga = ANY(${alias})`, { lga: query.lga }) } : {}),
+          
+        }
+        // profile: {
+        //   ...(query.lga ? { operatingLgas: In([query.lga]) } : {}),
+        //   ...(query.city ? { operatingCities: In([query.city]) } : {}),
+        // }
+      },
+      order: { createdAt: query.sortOrder === "ASC" ? "ASC" : "DESC" },
+      skip: (query.page - 1) * query.limit,
+      take: query.limit,
       relations: { profile: true },
     });
 
     return {
       data: entities.map(UserMapper.toDomain),
       total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
+      page: query.page,
+      limit: query.limit,
+      totalPages: Math.ceil(total / query.limit),
     };
   }
 

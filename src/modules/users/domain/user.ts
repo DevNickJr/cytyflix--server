@@ -23,6 +23,9 @@ export class UserProfile {
     public preferredLocation?: string,
     public budgetMin?: number,
     public budgetMax?: number,
-    public profileImage?: string
+    public profileImage?: string,
+    public operatingStates?: string[],
+    public operatingLgas?: string[],
+    public operatingCities?: string[],
   ) {}
 }

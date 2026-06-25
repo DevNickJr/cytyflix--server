@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { UserService } from "../application/user.service";
 import CustomError from "@/shared/utils/custom-error";
+import { SearchByLocationQuery } from "../contracts/user.interfaces";
 
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -57,9 +58,11 @@ export class UserController {
 
   getAgents = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 20;
-      const result = await this.userService.getAgents(page, limit);
+      const query = req.query as unknown as SearchByLocationQuery;
+          console.log({
+      queryaa: query
+    })
+      const result = await this.userService.getAgents(query);
       res.json({ success: true, ...result });
     } catch (error) {
       next(error);
@@ -67,8 +70,17 @@ export class UserController {
   };
 
   getAgent = async (req: Request, res: Response, next: NextFunction) => {
+    console.log({
+      newagent1: req.params.id
+    })
+    console.log('Get Aggent  trace', { params: req.params })
+
     try {
       const agent = await this.userService.getAgent(req.params.id as string);
+      console.log({
+        agent: agent
+      })
+      if (!agent) throw new CustomError("Agent not found", 404);
       res.json({ success: true, data: agent });
     } catch (error) {
       next(error);
@@ -77,9 +89,10 @@ export class UserController {
 
   getAgentProperties = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 12;
-      const result = await this.userService.getAgentProperties(req.params.id as string, page, limit);
+      const query = req.query as unknown as SearchByLocationQuery;
+      console.log('Aggent  trace', { params: req.params })
+
+      const result = await this.userService.getAgentProperties(req.params.id as string, query);
       res.json({ success: true, ...result });
     } catch (error) {
       next(error);

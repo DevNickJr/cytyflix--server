@@ -17,7 +17,7 @@ export class Booking {
     public readonly id: string,
     public clientId: string,
     public agentId: string,
-    public propertyId: string,
+    public propertyId: string | null,
     public amount: number,
     public paymentReference: string,
     public paymentStatus: PaymentStatus = PaymentStatus.PENDING,

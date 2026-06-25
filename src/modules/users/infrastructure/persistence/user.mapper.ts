@@ -18,6 +18,9 @@ export class UserMapper {
         entity.profile.budgetMin ? Number(entity.profile.budgetMin) : undefined,
         entity.profile.budgetMax ? Number(entity.profile.budgetMax) : undefined,
         entity.profile.profileImage,
+        entity.profile.operatingStates,
+        entity.profile.operatingLgas,
+        entity.profile.operatingCities
       );
     }
 
@@ -56,6 +59,9 @@ export class UserMapper {
       profileEntity.budgetMax = user.profile.budgetMax;
       profileEntity.profileImage = user.profile.profileImage;
       profileEntity.userId = user.id;
+      profileEntity.operatingStates = user.profile.operatingStates || [];
+      profileEntity.operatingLgas = user.profile.operatingLgas || [];
+      profileEntity.operatingCities = user.profile.operatingCities || [];
       entity.profile = profileEntity;
     }
 

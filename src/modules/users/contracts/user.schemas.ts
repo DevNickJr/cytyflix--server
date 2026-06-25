@@ -10,6 +10,9 @@ export const UpdateProfileSchema = z.object({
   budgetMin: z.number().positive().optional(),
   budgetMax: z.number().positive().optional(),
   profileImage: z.string().url().optional(),
+  operatingStates: z.array(z.string()).optional(),
+  operatingLgas: z.array(z.string()).optional(),
+  operatingCities: z.array(z.string()).optional(),
 });
 
 export type UpdateProfileDTO = z.infer<typeof UpdateProfileSchema>;

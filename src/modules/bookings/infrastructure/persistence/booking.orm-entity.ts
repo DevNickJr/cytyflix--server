@@ -13,8 +13,8 @@ export class BookingOrmEntity {
   @Column()
   agentId!: string;
 
-  @Column()
-  propertyId!: string;
+  @Column({ nullable: true })
+  propertyId!: string | null; 
 
   @Column({ type: "decimal" })
   amount!: number;
@@ -54,7 +54,7 @@ export class BookingOrmEntity {
   @JoinColumn({ name: "agentId" })
   agent!: UserOrmEntity;
 
-  @ManyToOne(() => PropertyOrmEntity)
+  @ManyToOne(() => PropertyOrmEntity, { nullable: true })
   @JoinColumn({ name: "propertyId" })
   property!: PropertyOrmEntity;
 
