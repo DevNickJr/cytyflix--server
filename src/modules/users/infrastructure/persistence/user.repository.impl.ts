@@ -1,4 +1,4 @@
-import { In, Raw, Repository } from "typeorm";
+import { Raw, Repository } from "typeorm";
 import { SearchByLocationQuery, UserRepository } from "@/modules/users/contracts/user.interfaces";
 import { User } from "@/modules/users/domain/user";
 import { PaginatedResult } from "@/modules/properties/contracts/property.interfaces";

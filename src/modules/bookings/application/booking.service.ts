@@ -123,7 +123,7 @@ export class BookingService {
 
     if (booking.clientConfirmed && booking.agentConfirmed) {
       booking.bookingStatus = BookingStatus.COMPLETED;
-      booking.expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000);
+      booking.expiresAt = new Date(new Date(booking.scheduledDate + " " + booking.scheduledTime).getTime() + 48 * 60 * 60 * 1000);
     }
 
     return this.bookingRepo.update(booking);
@@ -167,7 +167,7 @@ export class BookingService {
     const expired = await this.bookingRepo.findExpiredBookings();
     for (const booking of expired) {
       booking.bookingStatus = BookingStatus.COMPLETED;
-      booking.expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000);
+      booking.expiresAt = new Date(new Date(booking.scheduledDate + " " + booking.scheduledTime).getTime() + 48 * 60 * 60 * 1000);
       await this.bookingRepo.update(booking);
     }
     return { processed: expired.length };
