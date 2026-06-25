@@ -64,7 +64,7 @@ export default function preRouteMiddleware(app: Express) {
   // Middleware to conditionally apply JSON parsing
   app.use((req, res, next) => {
     if (
-      req.originalUrl?.includes('/api/v1/webhooks')
+      req.originalUrl?.includes('/webhook')
     ) {
       console.log('a webhook detected', req.originalUrl);
       next();
