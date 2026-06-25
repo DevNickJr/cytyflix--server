@@ -25,10 +25,6 @@ export class UserRepositoryImpl implements UserRepository {
     });
     if (!entity) return null;
 
-    console.log({
-      entity
-    })
-
     return UserMapper.toDomain(entity);
   }
 

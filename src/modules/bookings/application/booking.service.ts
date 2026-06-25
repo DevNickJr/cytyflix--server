@@ -20,7 +20,6 @@ export class BookingService {
     const agent = await this.userRepo.findById(dto.agentId);
     if (!agent) throw new CustomError("Agent not found", 404);
     if (agent.role !== RolesEnum.AGENT) throw new CustomError("User is not a verified agent", 400);
-    console.log("Agent found:", agent.id, "Role:", agent.role);
 
     if (clientId === dto.agentId) {
       throw new CustomError("You cannot book yourself", 400);
@@ -28,8 +27,6 @@ export class BookingService {
 
     const client = await this.userRepo.findById(clientId);
     if (!client) throw new CustomError("Client not found", 404);
-
-    console.log("Client found:", client.id, "Email:", client.email);
 
     const reference = `BKG-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
 
@@ -48,9 +45,7 @@ export class BookingService {
       dto.scheduledTime,
       dto.notes,
     );
-    console.log("Booking object created:", booking);
     const saved = await this.bookingRepo.create(booking);
-    console.log("Booking object saved:", saved);
 
 
     const paymentData = await initializeTransaction(
@@ -59,8 +54,6 @@ export class BookingService {
       reference,
       { bookingId: saved.id, clientId, agentId: dto.agentId, type: 'BOOKING' },
     );
-
-    console.log("Payment initialized:", paymentData);
 
     return {
       booking: saved,
@@ -80,6 +73,9 @@ export class BookingService {
 
     const event = JSON.parse(rawBody);
 
+    console.log({
+      event
+    })
     if (event.event === "charge.success") {
       const reference = event.data.reference;
       const booking = await this.bookingRepo.findByPaymentReference(reference);

@@ -34,6 +34,12 @@ const envSchema = z.object({
   // Paystack
   PAYSTACK_SECRET_KEY: z.string().default(''),
   PAYSTACK_PUBLIC_KEY: z.string().default(''),
+
+  // Email
+  EMAIL_PROVIDER: z.enum(['brevo', 'ses']).default('brevo'),
+  BREVO_API_KEY: z.string().default(''),
+  EMAIL_DEFAULT_FROM: z.string().default('noreply@cytyflix.com'),
+  EMAIL_DEFAULT_FROM_NAME: z.string().default('Cytyflix'),
 });
 
 const parsed = envSchema.safeParse(process.env);

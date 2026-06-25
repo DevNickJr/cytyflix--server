@@ -88,5 +88,6 @@ export function verifyWebhookSignature(body: string, signature: string): boolean
     .createHmac("sha512", env.PAYSTACK_SECRET_KEY)
     .update(body)
     .digest("hex");
+  console.log("Webhook signature verification:", { hash, signature, isValid: hash === signature });
   return hash === signature;
 }

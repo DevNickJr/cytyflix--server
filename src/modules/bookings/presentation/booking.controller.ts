@@ -6,10 +6,7 @@ export class BookingController {
 
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log("Booking started:", req.user!.id);
-
       const result = await this.service.createBooking(req.user!.id, req.body);
-      console.log("Booking created:", result);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       next(error);
