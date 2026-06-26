@@ -85,14 +85,16 @@ export class BookingService {
     })
     if (event.event === "charge.success") {
       const reference = event.data.reference;
-      console.log({
-        data: event.data,
-      })
       const booking = await this.bookingRepo.findByPaymentReference(reference);
       if (!booking) {
         console.error("Booking not found for reference:", reference);
         return;
       };
+
+      if (booking.paymentStatus === PaymentStatus.PAID) {
+        console.log("Booking already marked as paid:", booking.id);
+        return;
+      }
 
       booking.paymentStatus = PaymentStatus.PAID;
       booking.bookingStatus = BookingStatus.CONFIRMED;
