@@ -9,7 +9,7 @@ interface EmailTemplate {
 export function bookingConfirmedClientEmail(data: {
   clientName: string;
   agentName: string;
-  scheduledDate: string;
+  scheduledDate: Date;
   scheduledTime: string;
   bookingReference: string;
 }): EmailTemplate {
@@ -37,7 +37,7 @@ export function bookingConfirmedAgentEmail(data: {
   agentName: string;
   clientName: string;
   clientEmail: string;
-  scheduledDate: string;
+  scheduledDate: Date;
   scheduledTime: string;
   bookingReference: string;
 }): EmailTemplate {
@@ -66,7 +66,7 @@ export function bookingCancelledEmail(data: {
   recipientName: string;
   otherPartyName: string;
   bookingReference: string;
-  scheduledDate: string;
+  scheduledDate: Date;
   scheduledTime: string;
 }): EmailTemplate {
   return {

@@ -24,7 +24,7 @@ export class Booking {
     public bookingStatus: BookingStatus = BookingStatus.PENDING,
     public clientConfirmed: boolean = false,
     public agentConfirmed: boolean = false,
-    public scheduledDate: string = "",
+    public scheduledDate: Date,
     public scheduledTime: string = "",
     public notes?: string,
     public expiresAt?: Date,

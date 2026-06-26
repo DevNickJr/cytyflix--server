@@ -15,7 +15,7 @@ export interface BookingConfirmedPayload {
   agentId: string;
   agentName: string;
   agentEmail: string;
-  scheduledDate: string;
+  scheduledDate: Date;
   scheduledTime: string;
   bookingReference: string;
 }
@@ -28,7 +28,7 @@ export interface BookingCancelledPayload {
   agentId: string;
   agentName: string;
   agentEmail: string;
-  scheduledDate: string;
+  scheduledDate: Date;
   scheduledTime: string;
   bookingReference: string;
   cancelledBy: string;

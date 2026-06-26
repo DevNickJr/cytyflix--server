@@ -63,7 +63,7 @@ export default function preRouteMiddleware(app: Express) {
 
   // Middleware to conditionally apply JSON parsing
   app.use(express.json({
-        verify: (req, res, buf) => {
+        verify: (req, _, buf) => {
           (req as any).rawBody = buf.toString('utf8');
         },
       }));

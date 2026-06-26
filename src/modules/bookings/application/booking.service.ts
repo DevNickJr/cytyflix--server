@@ -47,7 +47,7 @@ export class BookingService {
       BookingStatus.PENDING,
       false,
       false,
-      dto.scheduledDate,
+      new Date(dto.scheduledDate),
       dto.scheduledTime,
       dto.notes,
     );
