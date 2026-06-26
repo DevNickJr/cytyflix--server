@@ -57,7 +57,7 @@ export class WalletController {
 
   deleteBeneficiary = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      await this.service.deleteBeneficiary(req.user!.id, req.params.id);
+      await this.service.deleteBeneficiary(req.user!.id, req.params.id as string);
       res.json({ success: true, message: "Beneficiary deleted" });
     } catch (error) {
       next(error);
