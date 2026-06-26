@@ -68,17 +68,17 @@ export class BookingService {
 
   async handleWebhook(rawBody: string, signature: string) {
     if (!verifyWebhookSignature(rawBody, signature)) {
-      // throw new CustomError("Invalid webhook signature", 400);
       console.log("Invalid webhook signature. Webhook allowed for testing.", {
         rawBody,
         signature,
       });
+      throw new CustomError("Invalid webhook signature", 400);
     }
 
     const event = JSON.parse(rawBody);
 
     console.log({
-      event: event.event,
+      events: event.event,
       reference: event.data.reference,
       amount: event.data.amount,
       status: event.data.status,
@@ -100,9 +100,7 @@ export class BookingService {
 
       // Look up client and agent for event data
       const client = await this.userRepo.findById(booking.clientId);
-      console.log("Client found:");
       const agent = await this.userRepo.findById(booking.agentId);
-      console.log("Agent found:");
       const clientName = client?.profile ? `${client.profile.firstName} ${client.profile.lastName}`.trim() : "Client";
       const agentName = agent?.profile ? `${agent.profile.firstName} ${agent.profile.lastName}`.trim() : "Agent";
 
@@ -118,7 +116,6 @@ export class BookingService {
         scheduledTime: booking.scheduledTime,
         bookingReference: booking.paymentReference,
       };
-      console.log("Booking confirmed payload:", payload);
       console.log("RabbitMQ connected:", rabbitMQ.isConnected());
 
       if (rabbitMQ.isConnected()) {
@@ -145,7 +142,6 @@ export class BookingService {
         });
 
         try {
-          console.log("Sending fallback emails to client and agent...");
           const clientTemplate = bookingConfirmedClientEmail({
             clientName,
             agentName,

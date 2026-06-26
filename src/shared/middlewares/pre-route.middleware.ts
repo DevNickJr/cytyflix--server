@@ -62,16 +62,11 @@ export default function preRouteMiddleware(app: Express) {
   });
 
   // Middleware to conditionally apply JSON parsing
-  app.use((req, res, next) => {
-    if (
-      req.originalUrl?.includes('/webhook')
-    ) {
-      console.log('a webhook detected', req.originalUrl);
-      next();
-    } else {
-      express.json()(req, res, next);
-    }
-  });
+  app.use(express.json({
+        verify: (req, res, buf) => {
+          (req as any).rawBody = buf.toString('utf8');
+        },
+      }));
 
   app.use(helmet()); // additional security layer by auto setting some important headers
   app.disable('x-powered-by'); // remove powered by express header for security purposes
