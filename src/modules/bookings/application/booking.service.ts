@@ -78,12 +78,21 @@ export class BookingService {
     const event = JSON.parse(rawBody);
 
     console.log({
-      event
+      event: event.event,
+      reference: event.data.reference,
+      amount: event.data.amount,
+      status: event.data.status,
     })
     if (event.event === "charge.success") {
       const reference = event.data.reference;
+      console.log({
+        data: event.data,
+      })
       const booking = await this.bookingRepo.findByPaymentReference(reference);
-      if (!booking) return;
+      if (!booking) {
+        console.error("Booking not found for reference:", reference);
+        return;
+      };
 
       booking.paymentStatus = PaymentStatus.PAID;
       booking.bookingStatus = BookingStatus.CONFIRMED;
@@ -91,7 +100,9 @@ export class BookingService {
 
       // Look up client and agent for event data
       const client = await this.userRepo.findById(booking.clientId);
+      console.log("Client found:");
       const agent = await this.userRepo.findById(booking.agentId);
+      console.log("Agent found:");
       const clientName = client?.profile ? `${client.profile.firstName} ${client.profile.lastName}`.trim() : "Client";
       const agentName = agent?.profile ? `${agent.profile.firstName} ${agent.profile.lastName}`.trim() : "Agent";
 
@@ -107,6 +118,8 @@ export class BookingService {
         scheduledTime: booking.scheduledTime,
         bookingReference: booking.paymentReference,
       };
+      console.log("Booking confirmed payload:", payload);
+      console.log("RabbitMQ connected:", rabbitMQ.isConnected());
 
       if (rabbitMQ.isConnected()) {
         publishEvent("booking.confirmed", {
@@ -132,6 +145,7 @@ export class BookingService {
         });
 
         try {
+          console.log("Sending fallback emails to client and agent...");
           const clientTemplate = bookingConfirmedClientEmail({
             clientName,
             agentName,
