@@ -1,4 +1,4 @@
-import { Repository, LessThan } from "typeorm";
+import { Repository, MoreThan } from "typeorm";
 import { BookingRepository } from "../../contracts/booking.interfaces";
 import { Booking, BookingStatus, PaymentStatus } from "../../domain/booking";
 import { PaginatedResult } from "@/modules/properties/contracts/property.interfaces";
@@ -75,7 +75,7 @@ export class BookingRepositoryImpl implements BookingRepository {
       where: {
         paymentStatus: PaymentStatus.PAID,
         bookingStatus: BookingStatus.CONFIRMED,
-        createdAt: LessThan(fortyEightHoursAgo),
+        scheduledDate: MoreThan(fortyEightHoursAgo),
       },
     });
 

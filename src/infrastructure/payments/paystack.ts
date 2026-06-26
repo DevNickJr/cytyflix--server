@@ -83,6 +83,38 @@ export async function initiateTransfer(
   });
 }
 
+export interface ResolvedAccount {
+  account_number: string;
+  account_name: string;
+  bank_id: number;
+}
+
+export async function resolveAccountNumber(
+  accountNumber: string,
+  bankCode: string,
+): Promise<ResolvedAccount> {
+  const response = await paystackClient.get("/bank/resolve", {
+    params: { account_number: accountNumber, bank_code: bankCode },
+  });
+  return response.data.data;
+}
+
+export interface PaystackBank {
+  id: number;
+  name: string;
+  slug: string;
+  code: string;
+  type: string;
+  currency: string;
+}
+
+export async function listBanks(): Promise<PaystackBank[]> {
+  const response = await paystackClient.get("/bank", {
+    params: { country: "nigeria", perPage: 100 },
+  });
+  return response.data.data;
+}
+
 export function verifyWebhookSignature(body: string, signature: string): boolean {
   const hash = crypto
     .createHmac("sha512", env.PAYSTACK_SECRET_KEY)

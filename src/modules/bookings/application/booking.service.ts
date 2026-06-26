@@ -3,6 +3,7 @@ import { Booking, PaymentStatus, BookingStatus } from "../domain/booking";
 import { BookingRepository } from "../contracts/booking.interfaces";
 import { CreateBookingDTO } from "../contracts/booking.schemas";
 import { UserRepository, RolesEnum } from "@/modules/users/contracts/user.interfaces";
+import { WalletService } from "@/modules/wallets/application/wallet.service";
 import { initializeTransaction, verifyWebhookSignature } from "@/infrastructure/payments/paystack";
 import { rabbitMQ } from "@/infrastructure/messaging/rabbitmq";
 import { publishEvent } from "@/infrastructure/messaging/event-bus";
@@ -18,6 +19,7 @@ export class BookingService {
   constructor(
     private readonly bookingRepo: BookingRepository,
     private readonly userRepo: UserRepository,
+    private readonly walletService: WalletService,
   ) {}
 
   async createBooking(clientId: string, dto: CreateBookingDTO) {
@@ -189,12 +191,21 @@ export class BookingService {
 
     if (booking.clientConfirmed && booking.agentConfirmed) {
       booking.bookingStatus = BookingStatus.COMPLETED;
-      booking.expiresAt = new Date(new Date(booking.scheduledDate + " " + booking.scheduledTime).getTime() + 48 * 60 * 60 * 1000);
+      // booking.expiresAt = new Date(new Date(booking.scheduledDate + " " + booking.scheduledTime).getTime() + 48 * 60 * 60 * 1000);
+
+      await this.walletService.creditWallet(
+        booking.agentId,
+        booking.amount,
+        `BKG-CREDIT-${booking.id}`,
+        `Booking payment from client`,
+        { bookingId: booking.id, clientId: booking.clientId },
+      );
     }
 
     return this.bookingRepo.update(booking);
   }
 
+  // TODO: REFund logic for cancelled bookings
   async cancelBooking(bookingId: string, userId: string) {
     const booking = await this.bookingRepo.findById(bookingId);
     if (!booking) throw new CustomError("Booking not found", 404);
@@ -207,6 +218,22 @@ export class BookingService {
       throw new CustomError("Cannot cancel a completed booking", 400);
     }
 
+    if (booking.clientConfirmed && booking.agentConfirmed) {
+      throw new CustomError("Cannot cancel a booking that has been confirmed by both parties", 400);
+    }
+
+    if (booking.agentConfirmed) {
+      throw new CustomError("Cannot cancel a booking that has been confirmed by the agent", 400);
+    }
+
+    if (booking.clientConfirmed && userId === booking.clientId) {
+      throw new CustomError("Client: You cannot cancel a booking that has been confirmed by you", 400);
+    }
+
+    if (booking.bookingStatus === BookingStatus.CANCELLED) {
+      throw new CustomError("Booking is already cancelled", 400);
+    }
+    
     booking.bookingStatus = BookingStatus.CANCELLED;
     const updated = await this.bookingRepo.update(booking);
 
@@ -296,7 +323,7 @@ export class BookingService {
     const expired = await this.bookingRepo.findExpiredBookings();
     for (const booking of expired) {
       booking.bookingStatus = BookingStatus.COMPLETED;
-      booking.expiresAt = new Date(new Date(booking.scheduledDate + " " + booking.scheduledTime).getTime() + 48 * 60 * 60 * 1000);
+      booking.expiresAt = new Date();
       await this.bookingRepo.update(booking);
     }
     return { processed: expired.length };

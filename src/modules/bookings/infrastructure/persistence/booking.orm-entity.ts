@@ -34,8 +34,8 @@ export class BookingOrmEntity {
   @Column({ default: false })
   agentConfirmed!: boolean;
 
-  @Column()
-  scheduledDate!: string;
+  @Column({ type: "timestamp", nullable: true })
+  scheduledDate!: Date;
 
   @Column()
   scheduledTime!: string;
