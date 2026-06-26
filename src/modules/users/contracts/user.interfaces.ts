@@ -6,6 +6,8 @@ export interface UserRepository {
   create(user: User): Promise<User>;
   findById(id: string): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
+  findBySlug(slug: string): Promise<User | null>;
+  slugExists(slug: string): Promise<boolean>;
   findByRole(role: string, query: SearchByLocationQuery): Promise<PaginatedResult<User>>;
   update(user: User): Promise<User>;
 }

@@ -3,14 +3,23 @@ import { AgentVerification, VerificationStatus } from "../domain/agent-verificat
 import { AgentVerificationRepository } from "../contracts/agent-verification.interfaces";
 import { SubmitVerificationDTO, ReviewVerificationDTO } from "../contracts/agent-verification.schemas";
 import { UserRepository, RolesEnum } from "@/modules/users/contracts/user.interfaces";
-import { NotificationService } from "@/modules/notifications/application/notification.service";
+import { rabbitMQ } from "@/infrastructure/messaging/rabbitmq";
+import { publishEvent } from "@/infrastructure/messaging/event-bus";
+import {
+  VERIFICATION_APPROVED,
+  VERIFICATION_REJECTED,
+  VerificationApprovedPayload,
+  VerificationRejectedPayload,
+} from "@/infrastructure/messaging/events";
+import { notificationService } from "@/modules/notifications/notification.module";
+import { sendEmail } from "@/infrastructure/email";
+import { verificationApprovedEmail, verificationRejectedEmail } from "@/infrastructure/email/templates";
 import CustomError from "@/shared/utils/custom-error";
 
 export class AgentVerificationService {
   constructor(
     private readonly verificationRepo: AgentVerificationRepository,
     private readonly userRepo: UserRepository,
-    private readonly notificationService: NotificationService,
   ) {}
 
   async submit(userId: string, dto: SubmitVerificationDTO) {
@@ -54,30 +63,77 @@ export class AgentVerificationService {
     verification.reviewedBy = reviewerId;
     verification.reviewedAt = new Date();
 
+    const user = await this.userRepo.findById(verification.userId);
+    const userName = user?.profile ? `${user.profile.firstName} ${user.profile.lastName}`.trim() : "User";
+    const userEmail = user?.email || "";
+
     if (dto.status === "approved") {
-      const user = await this.userRepo.findById(verification.userId);
       if (user) {
         user.role = RolesEnum.AGENT;
         await this.userRepo.update(user);
       }
 
-      await this.notificationService.createNotification({
+      const payload: VerificationApprovedPayload = {
+        verificationId: verification.id,
         userId: verification.userId,
-        type: "system",
-        title: "Verification Approved",
-        message: "Your agent verification has been approved. You can now operate as an agent on CytyFlix.",
-        metadata: { verificationId: verification.id },
-      });
+        userName,
+        userEmail,
+      };
+
+      if (rabbitMQ.isConnected()) {
+        publishEvent("verification.approved", {
+          type: VERIFICATION_APPROVED,
+          payload: payload as unknown as Record<string, unknown>,
+          timestamp: new Date().toISOString(),
+        });
+      } else {
+        await notificationService.createNotification({
+          userId: verification.userId,
+          type: "system",
+          title: "Verification Approved",
+          message: "Your agent verification has been approved. You can now operate as an agent on CytyFlix.",
+          metadata: { verificationId: verification.id },
+        });
+        try {
+          const template = verificationApprovedEmail({ agentName: userName });
+          await sendEmail({ to: userEmail, ...template });
+        } catch (emailError) {
+          console.error("Fallback email send failed:", emailError);
+        }
+      }
     } else {
       verification.rejectionReason = dto.rejectionReason;
+      const reason = dto.rejectionReason || "Not specified";
 
-      await this.notificationService.createNotification({
+      const payload: VerificationRejectedPayload = {
+        verificationId: verification.id,
         userId: verification.userId,
-        type: "system",
-        title: "Verification Rejected",
-        message: `Your agent verification was rejected. Reason: ${dto.rejectionReason || "Not specified"}`,
-        metadata: { verificationId: verification.id },
-      });
+        userName,
+        userEmail,
+        reason,
+      };
+
+      if (rabbitMQ.isConnected()) {
+        publishEvent("verification.rejected", {
+          type: VERIFICATION_REJECTED,
+          payload: payload as unknown as Record<string, unknown>,
+          timestamp: new Date().toISOString(),
+        });
+      } else {
+        await notificationService.createNotification({
+          userId: verification.userId,
+          type: "system",
+          title: "Verification Rejected",
+          message: `Your agent verification was rejected. Reason: ${reason}`,
+          metadata: { verificationId: verification.id },
+        });
+        try {
+          const template = verificationRejectedEmail({ agentName: userName, reason });
+          await sendEmail({ to: userEmail, ...template });
+        } catch (emailError) {
+          console.error("Fallback email send failed:", emailError);
+        }
+      }
     }
 
     return this.verificationRepo.update(verification);

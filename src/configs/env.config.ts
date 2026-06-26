@@ -40,6 +40,15 @@ const envSchema = z.object({
   BREVO_API_KEY: z.string().default(''),
   EMAIL_DEFAULT_FROM: z.string().default('noreply@cytyflix.com'),
   EMAIL_DEFAULT_FROM_NAME: z.string().default('Cytyflix'),
+
+  // AWS SES (for future use)
+  AWS_REGION: z.string().default(''),
+  AWS_ACCESS_KEY_ID: z.string().default(''),
+  AWS_SECRET_ACCESS_KEY: z.string().default(''),
+  SES_FROM_EMAIL: z.string().default(''),
+
+  // RabbitMQ
+  RABBITMQ_URL: z.string().default(''),
 });
 
 const parsed = envSchema.safeParse(process.env);

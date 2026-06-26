@@ -1,6 +1,7 @@
 import env from "@/configs/env.config";
 import type { EmailProvider, SendEmailParams, SendEmailResult } from "./email.types";
 import { brevoProvider } from "./brevo";
+import { sesProvider } from "./ses";
 
 export type { SendEmailParams, SendEmailResult, EmailProvider } from "./email.types";
 
@@ -9,7 +10,7 @@ function getProvider(): EmailProvider {
     case "brevo":
       return brevoProvider;
     case "ses":
-      throw new Error("SES email provider is not yet implemented");
+      return sesProvider;
     default:
       throw new Error(`Unknown email provider: ${env.EMAIL_PROVIDER}`);
   }

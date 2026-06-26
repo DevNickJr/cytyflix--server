@@ -27,5 +27,6 @@ export class UserProfile {
     public operatingStates?: string[],
     public operatingLgas?: string[],
     public operatingCities?: string[],
+    public slug?: string,
   ) {}
 }

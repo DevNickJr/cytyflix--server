@@ -3,6 +3,7 @@ import { UserRepository, RolesEnum, SearchByLocationQuery } from "@/modules/user
 import { PropertyRepository } from "@/modules/properties/contracts/property.interfaces";
 import { CreateUserDTO } from "@/modules/auth/contracts/auth.schemas";
 import { UpdateProfileDTO, UpdateRoleDTO } from "@/modules/users/contracts/user.schemas";
+import { generateSlug, validateSlug } from "@/shared/utils/slugify";
 import CustomError from "@/shared/utils/custom-error";
 
 export class UserService {
@@ -52,10 +53,19 @@ export class UserService {
 
     const currentProfile = user.profile || new UserProfile("", "", "", "");
 
+    const firstName = dto.firstName ?? currentProfile.firstName;
+    const lastName = dto.lastName ?? currentProfile.lastName;
+
+    // Auto-generate slug when name is set and no slug exists yet
+    let slug = currentProfile.slug;
+    if (!slug && firstName && lastName) {
+      slug = await this.generateUniqueSlug(firstName, lastName);
+    }
+
     user.profile = new UserProfile(
       currentProfile.id || crypto.randomUUID(),
-      dto.firstName ?? currentProfile.firstName,
-      dto.lastName ?? currentProfile.lastName,
+      firstName,
+      lastName,
       dto.phoneNumber ?? currentProfile.phoneNumber,
       dto.bio ?? currentProfile.bio,
       dto.preferredLocation ?? currentProfile.preferredLocation,
@@ -65,9 +75,70 @@ export class UserService {
       dto.operatingStates ?? currentProfile.operatingStates,
       dto.operatingLgas ?? currentProfile.operatingLgas,
       dto.operatingCities ?? currentProfile.operatingCities,
+      slug,
     );
 
     return this.userRepo.update(user);
+  }
+
+  private async generateUniqueSlug(firstName: string, lastName: string): Promise<string> {
+    const baseSlug = generateSlug(firstName, lastName);
+    if (!baseSlug) return "";
+
+    let slug = baseSlug;
+    let counter = 1;
+    while (await this.userRepo.slugExists(slug)) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+    return slug;
+  }
+
+  async updateSlug(userId: string, newSlug: string) {
+    if (!validateSlug(newSlug)) {
+      throw new CustomError("Invalid slug format. Must be 3-50 characters, lowercase alphanumeric with hyphens.", 400);
+    }
+
+    const existing = await this.userRepo.findBySlug(newSlug);
+    if (existing && existing.id !== userId) {
+      throw new CustomError("This slug is already taken", 409);
+    }
+
+    const user = await this.userRepo.findById(userId);
+    if (!user) throw new CustomError("User not found", 404);
+
+    const currentProfile = user.profile || new UserProfile("", "", "", "");
+    user.profile = new UserProfile(
+      currentProfile.id || crypto.randomUUID(),
+      currentProfile.firstName,
+      currentProfile.lastName,
+      currentProfile.phoneNumber,
+      currentProfile.bio,
+      currentProfile.preferredLocation,
+      currentProfile.budgetMin,
+      currentProfile.budgetMax,
+      currentProfile.profileImage,
+      currentProfile.operatingStates,
+      currentProfile.operatingLgas,
+      currentProfile.operatingCities,
+      newSlug,
+    );
+
+    return this.userRepo.update(user);
+  }
+
+  async getAgentBySlug(slug: string) {
+    const user = await this.userRepo.findBySlug(slug);
+    if (!user) throw new CustomError("Agent not found", 404);
+    if (user.role !== RolesEnum.AGENT) throw new CustomError("User is not an agent", 404);
+
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      profile: user.profile || null,
+      createdAt: user.createdAt,
+    };
   }
 
   async getAgents(query: SearchByLocationQuery) {
@@ -99,14 +170,10 @@ export class UserService {
   }
 
   async getAgentProperties(agentId: string, query: SearchByLocationQuery) {
-    console.log('Error trace 2', agentId)
-    
     const user = await this.userRepo.findById(agentId);
-    console.log('New Error trace 2')
     if (!user) throw new CustomError("Agent not found", 404);
     if (user.role !== RolesEnum.AGENT) throw new CustomError("User is not an agent", 404);
 
-    console.log('Error trace')
     return this.propertyRepo.findByOwnerId(agentId, query);
   }
 

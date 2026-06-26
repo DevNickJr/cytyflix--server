@@ -27,3 +27,16 @@ export const UpdateRoleSchema = z.object({
 });
 
 export type UpdateRoleDTO = z.infer<typeof UpdateRoleSchema>["body"];
+
+export const UpdateSlugSchema = z.object({
+  body: z.object({
+    slug: z.string()
+      .min(3, { error: "Slug must be at least 3 characters" })
+      .max(50, { error: "Slug must be at most 50 characters" })
+      .regex(/^[a-z0-9][a-z0-9-]*[a-z0-9]$/, {
+        error: "Slug must be lowercase alphanumeric with hyphens, starting and ending with an alphanumeric character",
+      }),
+  }),
+});
+
+export type UpdateSlugDTO = z.infer<typeof UpdateSlugSchema>["body"];

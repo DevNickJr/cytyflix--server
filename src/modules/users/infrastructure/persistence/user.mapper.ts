@@ -20,7 +20,8 @@ export class UserMapper {
         entity.profile.profileImage,
         entity.profile.operatingStates,
         entity.profile.operatingLgas,
-        entity.profile.operatingCities
+        entity.profile.operatingCities,
+        entity.profile.slug,
       );
     }
 
@@ -62,6 +63,7 @@ export class UserMapper {
       profileEntity.operatingStates = user.profile.operatingStates || [];
       profileEntity.operatingLgas = user.profile.operatingLgas || [];
       profileEntity.operatingCities = user.profile.operatingCities || [];
+      profileEntity.slug = user.profile.slug;
       entity.profile = profileEntity;
     }
 

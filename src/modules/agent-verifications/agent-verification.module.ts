@@ -6,7 +6,6 @@ import { agentVerificationRoutes } from "./presentation/agent-verification.route
 import { AppDataSource } from "@/infrastructure/database/app-data-source";
 import { UserRepositoryImpl } from "@/modules/users/infrastructure/persistence/user.repository.impl";
 import { UserOrmEntity } from "@/modules/users/infrastructure/persistence/user.orm-entity";
-import { notificationService } from "@/modules/notifications/notification.module";
 
 const ormRepo = AppDataSource.getRepository(AgentVerificationOrmEntity);
 const verificationRepository = new AgentVerificationRepositoryImpl(ormRepo);
@@ -17,7 +16,6 @@ const userRepository = new UserRepositoryImpl(userOrmRepo);
 const agentVerificationService = new AgentVerificationService(
   verificationRepository,
   userRepository,
-  notificationService,
 );
 
 const agentVerificationController = new AgentVerificationController(agentVerificationService);

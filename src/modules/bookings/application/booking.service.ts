@@ -3,8 +3,13 @@ import { Booking, PaymentStatus, BookingStatus } from "../domain/booking";
 import { BookingRepository } from "../contracts/booking.interfaces";
 import { CreateBookingDTO } from "../contracts/booking.schemas";
 import { UserRepository, RolesEnum } from "@/modules/users/contracts/user.interfaces";
-import { NotificationService } from "@/modules/notifications/application/notification.service";
 import { initializeTransaction, verifyWebhookSignature } from "@/infrastructure/payments/paystack";
+import { rabbitMQ } from "@/infrastructure/messaging/rabbitmq";
+import { publishEvent } from "@/infrastructure/messaging/event-bus";
+import { BOOKING_CONFIRMED, BOOKING_CANCELLED, BookingConfirmedPayload, BookingCancelledPayload } from "@/infrastructure/messaging/events";
+import { notificationService } from "@/modules/notifications/notification.module";
+import { sendEmail } from "@/infrastructure/email";
+import { bookingConfirmedClientEmail, bookingConfirmedAgentEmail, bookingCancelledEmail } from "@/infrastructure/email/templates";
 import CustomError from "@/shared/utils/custom-error";
 
 const BOOKING_AMOUNT = 5000; // NGN 5,000 per booking
@@ -13,7 +18,6 @@ export class BookingService {
   constructor(
     private readonly bookingRepo: BookingRepository,
     private readonly userRepo: UserRepository,
-    private readonly notificationService: NotificationService,
   ) {}
 
   async createBooking(clientId: string, dto: CreateBookingDTO) {
@@ -85,21 +89,71 @@ export class BookingService {
       booking.bookingStatus = BookingStatus.CONFIRMED;
       await this.bookingRepo.update(booking);
 
-      await this.notificationService.createNotification({
-        userId: booking.clientId,
-        type: "system",
-        title: "Booking Confirmed",
-        message: "Your payment was successful. Your booking has been confirmed.",
-        metadata: { bookingId: booking.id },
-      });
+      // Look up client and agent for event data
+      const client = await this.userRepo.findById(booking.clientId);
+      const agent = await this.userRepo.findById(booking.agentId);
+      const clientName = client?.profile ? `${client.profile.firstName} ${client.profile.lastName}`.trim() : "Client";
+      const agentName = agent?.profile ? `${agent.profile.firstName} ${agent.profile.lastName}`.trim() : "Agent";
 
-      await this.notificationService.createNotification({
-        userId: booking.agentId,
-        type: "system",
-        title: "New Booking",
-        message: "You have a new booking from a client.",
-        metadata: { bookingId: booking.id },
-      });
+      const payload: BookingConfirmedPayload = {
+        bookingId: booking.id,
+        clientId: booking.clientId,
+        clientName,
+        clientEmail: client?.email || "",
+        agentId: booking.agentId,
+        agentName,
+        agentEmail: agent?.email || "",
+        scheduledDate: booking.scheduledDate,
+        scheduledTime: booking.scheduledTime,
+        bookingReference: booking.paymentReference,
+      };
+
+      if (rabbitMQ.isConnected()) {
+        publishEvent("booking.confirmed", {
+          type: BOOKING_CONFIRMED,
+          payload: payload as unknown as Record<string, unknown>,
+          timestamp: new Date().toISOString(),
+        });
+      } else {
+        // Fallback: direct notification + email calls
+        await notificationService.createNotification({
+          userId: booking.clientId,
+          type: "system",
+          title: "Booking Confirmed",
+          message: "Your payment was successful. Your booking has been confirmed.",
+          metadata: { bookingId: booking.id },
+        });
+        await notificationService.createNotification({
+          userId: booking.agentId,
+          type: "system",
+          title: "New Booking",
+          message: `You have a new booking from ${clientName}.`,
+          metadata: { bookingId: booking.id },
+        });
+
+        try {
+          const clientTemplate = bookingConfirmedClientEmail({
+            clientName,
+            agentName,
+            scheduledDate: booking.scheduledDate,
+            scheduledTime: booking.scheduledTime,
+            bookingReference: booking.paymentReference,
+          });
+          await sendEmail({ to: client?.email || "", ...clientTemplate });
+
+          const agentTemplate = bookingConfirmedAgentEmail({
+            agentName,
+            clientName,
+            clientEmail: client?.email || "",
+            scheduledDate: booking.scheduledDate,
+            scheduledTime: booking.scheduledTime,
+            bookingReference: booking.paymentReference,
+          });
+          await sendEmail({ to: agent?.email || "", ...agentTemplate });
+        } catch (emailError) {
+          console.error("Fallback email send failed:", emailError);
+        }
+      }
     }
   }
 
@@ -142,7 +196,70 @@ export class BookingService {
     }
 
     booking.bookingStatus = BookingStatus.CANCELLED;
-    return this.bookingRepo.update(booking);
+    const updated = await this.bookingRepo.update(booking);
+
+    // Publish booking cancelled event
+    const client = await this.userRepo.findById(booking.clientId);
+    const agent = await this.userRepo.findById(booking.agentId);
+    const clientName = client?.profile ? `${client.profile.firstName} ${client.profile.lastName}`.trim() : "Client";
+    const agentName = agent?.profile ? `${agent.profile.firstName} ${agent.profile.lastName}`.trim() : "Agent";
+
+    const payload: BookingCancelledPayload = {
+      bookingId: booking.id,
+      clientId: booking.clientId,
+      clientName,
+      clientEmail: client?.email || "",
+      agentId: booking.agentId,
+      agentName,
+      agentEmail: agent?.email || "",
+      scheduledDate: booking.scheduledDate,
+      scheduledTime: booking.scheduledTime,
+      bookingReference: booking.paymentReference,
+      cancelledBy: userId,
+    };
+
+    if (rabbitMQ.isConnected()) {
+      publishEvent("booking.cancelled", {
+        type: BOOKING_CANCELLED,
+        payload: payload as unknown as Record<string, unknown>,
+        timestamp: new Date().toISOString(),
+      });
+    } else {
+      // Fallback: direct notifications + email
+      const otherPartyId = userId === booking.clientId ? booking.agentId : booking.clientId;
+      const cancellerName = userId === booking.clientId ? clientName : agentName;
+      await notificationService.createNotification({
+        userId: otherPartyId,
+        type: "system",
+        title: "Booking Cancelled",
+        message: `Your booking with ${cancellerName} has been cancelled.`,
+        metadata: { bookingId: booking.id },
+      });
+
+      try {
+        const clientTemplate = bookingCancelledEmail({
+          recipientName: clientName,
+          otherPartyName: agentName,
+          bookingReference: booking.paymentReference,
+          scheduledDate: booking.scheduledDate,
+          scheduledTime: booking.scheduledTime,
+        });
+        await sendEmail({ to: client?.email || "", ...clientTemplate });
+
+        const agentTemplate = bookingCancelledEmail({
+          recipientName: agentName,
+          otherPartyName: clientName,
+          bookingReference: booking.paymentReference,
+          scheduledDate: booking.scheduledDate,
+          scheduledTime: booking.scheduledTime,
+        });
+        await sendEmail({ to: agent?.email || "", ...agentTemplate });
+      } catch (emailError) {
+        console.error("Fallback email send failed:", emailError);
+      }
+    }
+
+    return updated;
   }
 
   async getMyBookings(userId: string, role: "client" | "agent", page: number, limit: number) {

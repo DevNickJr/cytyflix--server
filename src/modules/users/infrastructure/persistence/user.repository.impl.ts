@@ -35,10 +35,25 @@ export class UserRepositoryImpl implements UserRepository {
     return UserMapper.toDomain(entity);
   }
 
+  async findBySlug(slug: string): Promise<User | null> {
+    const entity = await this.ormRepo.findOne({
+      where: { profile: { slug } },
+      relations: { profile: true },
+    });
+    if (!entity) return null;
+
+    return UserMapper.toDomain(entity);
+  }
+
+  async slugExists(slug: string): Promise<boolean> {
+    const count = await this.ormRepo.count({
+      where: { profile: { slug } },
+      relations: { profile: true },
+    });
+    return count > 0;
+  }
+
   async findByRole(role: string, query: SearchByLocationQuery): Promise<PaginatedResult<User>> {
-    console.log({
-      query
-    })
     const [entities, total] = await this.ormRepo.findAndCount({
       where: { 
         role,

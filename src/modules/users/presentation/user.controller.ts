@@ -99,6 +99,28 @@ export class UserController {
     }
   };
 
+  getAgentBySlug = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const agent = await this.userService.getAgentBySlug(req.params.slug as string);
+      if (!agent) throw new CustomError("Agent not found", 404);
+      res.json({ success: true, data: agent });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateSlug = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) throw new CustomError("User is not authorized", 403);
+
+      const user = await this.userService.updateSlug(userId, req.body.slug);
+      res.json({ success: true, data: user });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   makeAdminOrAgent = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user?.id;

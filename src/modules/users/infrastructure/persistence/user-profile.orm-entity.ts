@@ -40,6 +40,9 @@ export class UserProfileOrmEntity {
   @Column("text", { array: true, default: [] })
   operatingCities!: string[];  // e.g., ["Lagos", "Ikeja", "Abeokuta South"]
 
+  @Column({ unique: true, nullable: true })
+  slug?: string;
+
   @OneToOne(() => UserOrmEntity, user => user.profile)
   @JoinColumn()
   user!: UserOrmEntity;
