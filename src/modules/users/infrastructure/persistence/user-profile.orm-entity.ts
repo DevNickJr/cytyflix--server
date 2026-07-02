@@ -27,7 +27,7 @@ export class UserProfileOrmEntity {
   @Column({ type: "decimal", nullable: true })
   budgetMax?: number;
 
-  @Column({ nullable: true, default:"https://www.clipartmax.com/png/middle/144-1442578_flat-person-icon-download-dummy-man.png" })
+  @Column({ nullable: true, default:"https://cytyflix.com/dummy-man.png" })
   profileImage?: string;
 
   // Native Postgres string arrays
