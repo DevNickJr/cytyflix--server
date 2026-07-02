@@ -3,14 +3,14 @@ import { UserController } from "./user.controller";
 import { AuthGuard, RoleGuard } from "@/shared/middlewares/auth.middleware";
 import { RolesEnum, SearchByLocationQuerySchema } from "../contracts/user.interfaces";
 import validateRequest from "@/shared/middlewares/validate-request";
-import { UpdateRoleSchema, UpdateSlugSchema } from "../contracts/user.schemas";
+import { UpdateProfileSchema, UpdateRoleSchema, UpdateSlugSchema } from "../contracts/user.schemas";
 import { IdParam } from "@/shared/schemas";
 
 export const userRoutes = (controller: UserController) => {
   const router = Router();
 
   router.get("/me", AuthGuard, controller.getMe);
-  router.put("/me", AuthGuard, controller.updateProfile);
+  router.put("/me", AuthGuard, validateRequest([UpdateProfileSchema]), controller.updateProfile);
   router.patch("/me/slug", AuthGuard, RoleGuard([RolesEnum.AGENT]), validateRequest([UpdateSlugSchema]), controller.updateSlug);
   router.get("/agents", validateRequest([SearchByLocationQuerySchema]), controller.getAgents);
   router.get("/agents/by-slug/:slug", controller.getAgentBySlug);
