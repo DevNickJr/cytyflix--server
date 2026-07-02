@@ -310,7 +310,8 @@ Internal/Private Project
 
 # TODO
 [ ] - aGENT PAGE, maybe a subdomain (so they will have something to share on socials that contains all their listings)
-[ ] - share feature to socials
+[ ] - share feature to socials (agents page and properties and show thumbnail)
+[ ] - pin properties on agents page
 [ ] - Analytics, calculate views and other metrics (ratings, etc) and use for app baesed recommendation
 [ ] - personalized recommendations
 [ ] - auto description with AI

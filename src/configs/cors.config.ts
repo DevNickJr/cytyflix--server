@@ -26,7 +26,17 @@ export const corsOptions = {
           .includes(normalizedOrigin) ||
         otherHosts
           .map(o => o.toLowerCase().replace(/\/$/, ''))
-          .includes(normalizedOrigin);
+          .includes(normalizedOrigin) ||
+        whitelist
+          .some(o => {
+            const val = o.toLowerCase().replace(/\/$/, '').replace('https://', '')
+            return normalizedOrigin.endsWith(val)
+          }) ||
+        otherHosts
+          .some(o => {
+            const val = o.toLowerCase().replace(/\/$/, '').replace('https://', '')
+            return normalizedOrigin.endsWith(val)
+          })
 
       if (allowed) {
         callback(null, true);
