@@ -9,7 +9,7 @@ const QUEUES = {
   DB_NOTIFICATIONS: "db.notifications",
 } as const;
 
-const ROUTING_KEYS = ["booking.*", "inquiry.*", "verification.*"];
+const ROUTING_KEYS = ["booking.*", "inquiry.*", "verification.*", "property.*", "rent.*", "agreement.*"];
 
 class RabbitMQManager {
   private connection: ChannelModel | null = null;

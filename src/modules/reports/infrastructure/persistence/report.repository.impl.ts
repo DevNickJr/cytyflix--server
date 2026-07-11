@@ -51,4 +51,13 @@ export class ReportRepositoryImpl implements ReportRepository {
     const updated = await this.ormRepo.save(entity);
     return ReportMapper.toDomain(updated);
   }
+
+  async countUniqueReporters(propertyId: string): Promise<number> {
+    const result = await this.ormRepo
+      .createQueryBuilder("report")
+      .select("COUNT(DISTINCT report.userId)", "count")
+      .where("report.propertyId = :propertyId", { propertyId })
+      .getRawOne();
+    return parseInt(result?.count || "0", 10);
+  }
 }

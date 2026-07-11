@@ -6,4 +6,5 @@ export interface ReportRepository {
   findById(id: string): Promise<Report | null>;
   findAll(status: string | undefined, page: number, limit: number): Promise<PaginatedResult<Report>>;
   update(report: Report): Promise<Report>;
+  countUniqueReporters(propertyId: string): Promise<number>;
 }

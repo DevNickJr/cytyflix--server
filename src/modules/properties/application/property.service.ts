@@ -30,8 +30,11 @@ export class PropertyService {
       dto.interiorImages,
       dto.exteriorImages,
       dto.streetImages,
+      dto.walkthroughVideo,
       true,
       false,
+      false,
+      undefined,
       ownerId,
     );
 
@@ -75,6 +78,7 @@ export class PropertyService {
     if (dto.interiorImages !== undefined) property.interiorImages = dto.interiorImages;
     if (dto.exteriorImages !== undefined) property.exteriorImages = dto.exteriorImages;
     if (dto.streetImages !== undefined) property.streetImages = dto.streetImages;
+    if (dto.walkthroughVideo !== undefined) property.walkthroughVideo = dto.walkthroughVideo;
 
     return this.propertyRepo.update(property);
   }

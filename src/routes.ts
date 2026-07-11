@@ -12,6 +12,8 @@ import { reportRouter, reportAdminRouter } from "@/modules/reports/report.module
 import { bookingRouter } from "@/modules/bookings/booking.module";
 import { analyticsRouter } from "@/modules/analytics/analytics.module";
 import { walletRouter } from "@/modules/wallets/wallet.module";
+import { rentPaymentRouter } from "@/modules/rent-payments/rent-payment.module";
+import { tenancyAgreementRouter } from "@/modules/tenancy-agreements/tenancy-agreement.module";
 
 const V1 = '/api/v1'
 
@@ -29,4 +31,6 @@ export function registerRoutes(app: Express) {
   app.use(`${V1}/bookings`, bookingRouter);
   app.use(`${V1}/analytics`, analyticsRouter);
   app.use(`${V1}/wallets`, walletRouter);
+  app.use(`${V1}/rent-payments`, rentPaymentRouter);
+  app.use(`${V1}/tenancy-agreements`, tenancyAgreementRouter);
 }

@@ -14,7 +14,7 @@ const bookingRepository = new BookingRepositoryImpl(bookingOrmRepo);
 const userOrmRepo = AppDataSource.getRepository(UserOrmEntity);
 const userRepository = new UserRepositoryImpl(userOrmRepo);
 
-const bookingService = new BookingService(bookingRepository, userRepository, walletService);
+export const bookingService = new BookingService(bookingRepository, userRepository, walletService);
 const bookingController = new BookingController(bookingService);
 
 export const bookingRouter = bookingRoutes(bookingController);

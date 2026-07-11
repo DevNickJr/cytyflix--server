@@ -1,16 +1,34 @@
 import crypto from "crypto";
 import { Booking, PaymentStatus, BookingStatus } from "../domain/booking";
 import { BookingRepository } from "../contracts/booking.interfaces";
-import { CreateBookingDTO } from "../contracts/booking.schemas";
+import { CreateBookingDTO, UpdateBookingScheduleDTO } from "../contracts/booking.schemas";
 import { UserRepository, RolesEnum } from "@/modules/users/contracts/user.interfaces";
 import { WalletService } from "@/modules/wallets/application/wallet.service";
 import { initializeTransaction, verifyWebhookSignature } from "@/infrastructure/payments/paystack";
 import { rabbitMQ } from "@/infrastructure/messaging/rabbitmq";
 import { publishEvent } from "@/infrastructure/messaging/event-bus";
-import { BOOKING_CONFIRMED, BOOKING_CANCELLED, BookingConfirmedPayload, BookingCancelledPayload } from "@/infrastructure/messaging/events";
+import {
+  BOOKING_CANCELLED,
+  BOOKING_PAYMENT_RECEIVED,
+  BOOKING_AGENT_CONFIRMED,
+  BOOKING_CLIENT_RELEASED,
+  BOOKING_SCHEDULE_UPDATED,
+  BookingCancelledPayload,
+  BookingPaymentReceivedPayload,
+  BookingAgentConfirmedPayload,
+  BookingClientReleasedPayload,
+  BookingScheduleUpdatedPayload,
+} from "@/infrastructure/messaging/events";
 import { notificationService } from "@/modules/notifications/notification.module";
 import { sendEmail } from "@/infrastructure/email";
-import { bookingConfirmedClientEmail, bookingConfirmedAgentEmail, bookingCancelledEmail } from "@/infrastructure/email/templates";
+import {
+  bookingPaymentReceivedClientEmail,
+  bookingPaymentReceivedAgentEmail,
+  bookingAgentConfirmedEmail,
+  bookingScheduleUpdatedEmail,
+  bookingClientReleasedEmail,
+  bookingCancelledEmail,
+} from "@/infrastructure/email/templates";
 import CustomError from "@/shared/utils/custom-error";
 
 const BOOKING_AMOUNT = 5000; // NGN 5,000 per booking
@@ -21,6 +39,14 @@ export class BookingService {
     private readonly userRepo: UserRepository,
     private readonly walletService: WalletService,
   ) {}
+
+  private async getParticipantNames(clientId: string, agentId: string) {
+    const client = await this.userRepo.findById(clientId);
+    const agent = await this.userRepo.findById(agentId);
+    const clientName = client?.profile ? `${client.profile.firstName} ${client.profile.lastName}`.trim() : "Client";
+    const agentName = agent?.profile ? `${agent.profile.firstName} ${agent.profile.lastName}`.trim() : "Agent";
+    return { client, agent, clientName, agentName };
+  }
 
   async createBooking(clientId: string, dto: CreateBookingDTO) {
     const agent = await this.userRepo.findById(dto.agentId);
@@ -52,7 +78,6 @@ export class BookingService {
       dto.notes,
     );
     const saved = await this.bookingRepo.create(booking);
-
 
     const paymentData = await initializeTransaction(
       client.email,
@@ -99,16 +124,12 @@ export class BookingService {
       }
 
       booking.paymentStatus = PaymentStatus.PAID;
-      booking.bookingStatus = BookingStatus.CONFIRMED;
+      booking.bookingStatus = BookingStatus.AWAITING_AGENT_CONFIRMATION;
       await this.bookingRepo.update(booking);
 
-      // Look up client and agent for event data
-      const client = await this.userRepo.findById(booking.clientId);
-      const agent = await this.userRepo.findById(booking.agentId);
-      const clientName = client?.profile ? `${client.profile.firstName} ${client.profile.lastName}`.trim() : "Client";
-      const agentName = agent?.profile ? `${agent.profile.firstName} ${agent.profile.lastName}`.trim() : "Agent";
+      const { client, agent, clientName, agentName } = await this.getParticipantNames(booking.clientId, booking.agentId);
 
-      const payload: BookingConfirmedPayload = {
+      const payload: BookingPaymentReceivedPayload = {
         bookingId: booking.id,
         clientId: booking.clientId,
         clientName,
@@ -120,33 +141,32 @@ export class BookingService {
         scheduledTime: booking.scheduledTime,
         bookingReference: booking.paymentReference,
       };
-      console.log("RabbitMQ connected:", rabbitMQ.isConnected());
 
       if (rabbitMQ.isConnected()) {
-        publishEvent("booking.confirmed", {
-          type: BOOKING_CONFIRMED,
+        publishEvent("booking.payment_received", {
+          type: BOOKING_PAYMENT_RECEIVED,
           payload: payload as unknown as Record<string, unknown>,
           timestamp: new Date().toISOString(),
         });
       } else {
-        // Fallback: direct notification + email calls
         await notificationService.createNotification({
           userId: booking.clientId,
           type: "system",
-          title: "Booking Confirmed",
-          message: "Your payment was successful. Your booking has been confirmed.",
+          title: "Payment Received",
+          message: "Your payment was successful. Waiting for agent to confirm the booking.",
           metadata: { bookingId: booking.id },
         });
         await notificationService.createNotification({
           userId: booking.agentId,
           type: "system",
-          title: "New Booking",
-          message: `You have a new booking from ${clientName}.`,
+          title: "New Booking — Action Required",
+          message: `${clientName} has paid for a booking with you. Please confirm or cancel.`,
           metadata: { bookingId: booking.id },
         });
 
         try {
-          const clientTemplate = bookingConfirmedClientEmail({
+          const clientTemplate = bookingPaymentReceivedClientEmail({
+            bookingId: booking.id,
             clientName,
             agentName,
             scheduledDate: booking.scheduledDate,
@@ -155,7 +175,7 @@ export class BookingService {
           });
           await sendEmail({ to: client?.email || "", ...clientTemplate });
 
-          const agentTemplate = bookingConfirmedAgentEmail({
+          const agentTemplate = bookingPaymentReceivedAgentEmail({
             agentName,
             clientName,
             clientEmail: client?.email || "",
@@ -171,41 +191,223 @@ export class BookingService {
     }
   }
 
-  async confirmMeeting(bookingId: string, userId: string) {
+  async agentConfirm(bookingId: string, agentUserId: string) {
     const booking = await this.bookingRepo.findById(bookingId);
     if (!booking) throw new CustomError("Booking not found", 404);
 
-    if (booking.clientId !== userId && booking.agentId !== userId) {
-      throw new CustomError("You are not a participant of this booking", 403);
+    if (booking.agentId !== agentUserId) {
+      throw new CustomError("Only the assigned agent can confirm this booking", 403);
     }
 
-    if (booking.bookingStatus !== BookingStatus.CONFIRMED) {
-      throw new CustomError("Booking is not in confirmed status", 400);
+    if (booking.bookingStatus !== BookingStatus.AWAITING_AGENT_CONFIRMATION) {
+      throw new CustomError("Booking is not awaiting agent confirmation", 400);
     }
 
-    if (userId === booking.clientId) {
-      booking.clientConfirmed = true;
+    booking.bookingStatus = BookingStatus.CONFIRMED;
+    booking.agentConfirmed = true;
+    const updated = await this.bookingRepo.update(booking);
+
+    const { client, agent, clientName, agentName } = await this.getParticipantNames(booking.clientId, booking.agentId);
+
+    const payload: BookingAgentConfirmedPayload = {
+      bookingId: booking.id,
+      clientId: booking.clientId,
+      clientName,
+      clientEmail: client?.email || "",
+      agentId: booking.agentId,
+      agentName,
+      agentEmail: agent?.email || "",
+      scheduledDate: booking.scheduledDate,
+      scheduledTime: booking.scheduledTime,
+      bookingReference: booking.paymentReference,
+    };
+
+    if (rabbitMQ.isConnected()) {
+      publishEvent("booking.agent_confirmed", {
+        type: BOOKING_AGENT_CONFIRMED,
+        payload: payload as unknown as Record<string, unknown>,
+        timestamp: new Date().toISOString(),
+      });
     } else {
-      booking.agentConfirmed = true;
+      await notificationService.createNotification({
+        userId: booking.clientId,
+        type: "system",
+        title: "Booking Confirmed",
+        message: `${agentName} has confirmed your booking. You're all set for the inspection!`,
+        metadata: { bookingId: booking.id },
+      });
+
+      try {
+        const template = bookingAgentConfirmedEmail({
+          bookingId: booking.id,
+          clientName,
+          agentName,
+          scheduledDate: booking.scheduledDate,
+          scheduledTime: booking.scheduledTime,
+          bookingReference: booking.paymentReference,
+        });
+        await sendEmail({ to: client?.email || "", ...template });
+      } catch (emailError) {
+        console.error("Fallback email send failed:", emailError);
+      }
     }
 
-    if (booking.clientConfirmed && booking.agentConfirmed) {
-      booking.bookingStatus = BookingStatus.COMPLETED;
-      // booking.expiresAt = new Date(new Date(booking.scheduledDate + " " + booking.scheduledTime).getTime() + 48 * 60 * 60 * 1000);
+    return updated;
+  }
 
-      await this.walletService.creditWallet(
-        booking.agentId,
-        booking.amount,
-        `BKG-CREDIT-${booking.id}`,
-        `Booking payment from client`,
-        { bookingId: booking.id, clientId: booking.clientId },
-      );
+  async clientRelease(bookingId: string, clientUserId: string) {
+    const booking = await this.bookingRepo.findById(bookingId);
+    if (!booking) throw new CustomError("Booking not found", 404);
+
+    if (booking.clientId !== clientUserId) {
+      throw new CustomError("Only the client can release payment", 403);
     }
 
+    if (booking.bookingStatus !== BookingStatus.CONFIRMED && booking.bookingStatus !== BookingStatus.AWAITING_AGENT_CONFIRMATION) {
+      throw new CustomError("Booking is not in a releasable state", 400);
+    }
+
+    if (booking.paymentStatus !== PaymentStatus.PAID) {
+      throw new CustomError("Payment has not been made for this booking", 400);
+    }
+
+    booking.bookingStatus = BookingStatus.COMPLETED;
+    booking.clientConfirmed = true;
+    const updated = await this.bookingRepo.update(booking);
+
+    await this.walletService.creditWallet(
+      booking.agentId,
+      booking.amount,
+      `BKG-CREDIT-${booking.id}`,
+      `Booking payment from client`,
+      { bookingId: booking.id, clientId: booking.clientId },
+    );
+
+    const { client, agent, clientName, agentName } = await this.getParticipantNames(booking.clientId, booking.agentId);
+
+    const payload: BookingClientReleasedPayload = {
+      bookingId: booking.id,
+      clientId: booking.clientId,
+      clientName,
+      clientEmail: client?.email || "",
+      agentId: booking.agentId,
+      agentName,
+      agentEmail: agent?.email || "",
+      amount: booking.amount,
+      bookingReference: booking.paymentReference,
+    };
+
+    if (rabbitMQ.isConnected()) {
+      publishEvent("booking.client_released", {
+        type: BOOKING_CLIENT_RELEASED,
+        payload: payload as unknown as Record<string, unknown>,
+        timestamp: new Date().toISOString(),
+      });
+    } else {
+      await notificationService.createNotification({
+        userId: booking.agentId,
+        type: "system",
+        title: "Payment Released",
+        message: `${clientName} has released the payment. NGN ${booking.amount.toLocaleString()} has been credited to your wallet.`,
+        metadata: { bookingId: booking.id },
+      });
+
+      try {
+        const template = bookingClientReleasedEmail({
+          agentName,
+          clientName,
+          amount: booking.amount,
+          bookingReference: booking.paymentReference,
+        });
+        await sendEmail({ to: agent?.email || "", ...template });
+      } catch (emailError) {
+        console.error("Fallback email send failed:", emailError);
+      }
+    }
+
+    return updated;
+  }
+
+  async updateSchedule(bookingId: string, clientUserId: string, dto: UpdateBookingScheduleDTO) {
+    const booking = await this.bookingRepo.findById(bookingId);
+    if (!booking) throw new CustomError("Booking not found", 404);
+
+    if (booking.clientId !== clientUserId) {
+      throw new CustomError("Only the client can update the schedule", 403);
+    }
+
+    if (booking.bookingStatus !== BookingStatus.AWAITING_AGENT_CONFIRMATION) {
+      throw new CustomError("Schedule can only be updated before agent confirms", 400);
+    }
+
+    if (dto.scheduledDate) booking.scheduledDate = new Date(dto.scheduledDate);
+    if (dto.scheduledTime) booking.scheduledTime = dto.scheduledTime;
+    const updated = await this.bookingRepo.update(booking);
+
+    const { client, agent, clientName, agentName } = await this.getParticipantNames(booking.clientId, booking.agentId);
+
+    const payload: BookingScheduleUpdatedPayload = {
+      bookingId: booking.id,
+      clientId: booking.clientId,
+      clientName,
+      clientEmail: client?.email || "",
+      agentId: booking.agentId,
+      agentName,
+      agentEmail: agent?.email || "",
+      scheduledDate: booking.scheduledDate,
+      scheduledTime: booking.scheduledTime,
+      bookingReference: booking.paymentReference,
+    };
+
+    if (rabbitMQ.isConnected()) {
+      publishEvent("booking.schedule_updated", {
+        type: BOOKING_SCHEDULE_UPDATED,
+        payload: payload as unknown as Record<string, unknown>,
+        timestamp: new Date().toISOString(),
+      });
+    } else {
+      await notificationService.createNotification({
+        userId: booking.agentId,
+        type: "system",
+        title: "Booking Schedule Updated",
+        message: `${clientName} has updated the schedule for booking ${booking.paymentReference}.`,
+        metadata: { bookingId: booking.id },
+      });
+
+      try {
+        const template = bookingScheduleUpdatedEmail({
+          agentName,
+          clientName,
+          scheduledDate: booking.scheduledDate,
+          scheduledTime: booking.scheduledTime,
+          bookingReference: booking.paymentReference,
+        });
+        await sendEmail({ to: agent?.email || "", ...template });
+      } catch (emailError) {
+        console.error("Fallback email send failed:", emailError);
+      }
+    }
+
+    return updated;
+  }
+
+  async rejectBooking(bookingId: string, clientUserId: string) {
+    const booking = await this.bookingRepo.findById(bookingId);
+    if (!booking) throw new CustomError("Booking not found", 404);
+
+    if (booking.clientId !== clientUserId) {
+      throw new CustomError("Only the client can reject this booking", 403);
+    }
+
+    if (booking.bookingStatus !== BookingStatus.CONFIRMED && booking.bookingStatus !== BookingStatus.AWAITING_AGENT_CONFIRMATION) {
+      throw new CustomError("Booking cannot be rejected in its current state", 400);
+    }
+
+    booking.bookingStatus = BookingStatus.DISPUTED;
     return this.bookingRepo.update(booking);
   }
 
-  // TODO: REFund logic for cancelled bookings
+  // TODO: Refund logic for cancelled bookings
   async cancelBooking(bookingId: string, userId: string) {
     const booking = await this.bookingRepo.findById(bookingId);
     if (!booking) throw new CustomError("Booking not found", 404);
@@ -218,30 +420,18 @@ export class BookingService {
       throw new CustomError("Cannot cancel a completed booking", 400);
     }
 
-    if (booking.clientConfirmed && booking.agentConfirmed) {
-      throw new CustomError("Cannot cancel a booking that has been confirmed by both parties", 400);
-    }
-
-    if (booking.agentConfirmed) {
-      throw new CustomError("Cannot cancel a booking that has been confirmed by the agent", 400);
-    }
-
-    if (booking.clientConfirmed && userId === booking.clientId) {
-      throw new CustomError("Client: You cannot cancel a booking that has been confirmed by you", 400);
-    }
-
     if (booking.bookingStatus === BookingStatus.CANCELLED) {
       throw new CustomError("Booking is already cancelled", 400);
     }
-    
+
+    if (booking.bookingStatus === BookingStatus.CONFIRMED && userId === booking.clientId) {
+      throw new CustomError("Cannot cancel after agent has confirmed. You can release payment or raise a dispute instead.", 400);
+    }
+
     booking.bookingStatus = BookingStatus.CANCELLED;
     const updated = await this.bookingRepo.update(booking);
 
-    // Publish booking cancelled event
-    const client = await this.userRepo.findById(booking.clientId);
-    const agent = await this.userRepo.findById(booking.agentId);
-    const clientName = client?.profile ? `${client.profile.firstName} ${client.profile.lastName}`.trim() : "Client";
-    const agentName = agent?.profile ? `${agent.profile.firstName} ${agent.profile.lastName}`.trim() : "Agent";
+    const { client, agent, clientName, agentName } = await this.getParticipantNames(booking.clientId, booking.agentId);
 
     const payload: BookingCancelledPayload = {
       bookingId: booking.id,
@@ -264,7 +454,6 @@ export class BookingService {
         timestamp: new Date().toISOString(),
       });
     } else {
-      // Fallback: direct notifications + email
       const otherPartyId = userId === booking.clientId ? booking.agentId : booking.clientId;
       const cancellerName = userId === booking.clientId ? clientName : agentName;
       await notificationService.createNotification({
@@ -319,12 +508,49 @@ export class BookingService {
     return booking;
   }
 
+  async getReceiptData(bookingId: string, userId: string) {
+    const booking = await this.bookingRepo.findById(bookingId);
+    if (!booking) throw new CustomError("Booking not found", 404);
+
+    if (booking.clientId !== userId && booking.agentId !== userId) {
+      throw new CustomError("You are not a participant of this booking", 403);
+    }
+
+    if (booking.paymentStatus !== PaymentStatus.PAID) {
+      throw new CustomError("Payment has not been made for this booking", 400);
+    }
+
+    const { clientName, agentName } = await this.getParticipantNames(booking.clientId, booking.agentId);
+
+    return {
+      bookingReference: booking.paymentReference,
+      clientName,
+      agentName,
+      amount: booking.amount,
+      scheduledDate: booking.scheduledDate,
+      scheduledTime: booking.scheduledTime,
+      paymentDate: booking.updatedAt,
+    };
+  }
+
   async autoRelease() {
     const expired = await this.bookingRepo.findExpiredBookings();
     for (const booking of expired) {
       booking.bookingStatus = BookingStatus.COMPLETED;
-      booking.expiresAt = new Date();
+      booking.clientConfirmed = true;
       await this.bookingRepo.update(booking);
+
+      try {
+        await this.walletService.creditWallet(
+          booking.agentId,
+          booking.amount,
+          `BKG-CREDIT-${booking.id}`,
+          `Booking auto-release payment`,
+          { bookingId: booking.id, clientId: booking.clientId, autoRelease: true },
+        );
+      } catch (error) {
+        console.error(`Failed to credit wallet for auto-release booking ${booking.id}:`, error);
+      }
     }
     return { processed: expired.length };
   }

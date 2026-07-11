@@ -25,8 +25,11 @@ export class PropertyMapper {
       entity.interiorImages || [],
       entity.exteriorImages || [],
       entity.streetImages || [],
+      entity.walkthroughVideo || "",
       entity.isAvailable,
       entity.isFeatured,
+      entity.isFrozen ?? false,
+      entity.frozenReason,
       entity.ownerId,
       entity.createdAt,
       entity.updatedAt,
@@ -57,8 +60,11 @@ export class PropertyMapper {
     entity.interiorImages = property.interiorImages;
     entity.exteriorImages = property.exteriorImages;
     entity.streetImages = property.streetImages;
+    entity.walkthroughVideo = property.walkthroughVideo;
     entity.isAvailable = property.isAvailable;
     entity.isFeatured = property.isFeatured;
+    entity.isFrozen = property.isFrozen;
+    entity.frozenReason = property.frozenReason;
     entity.ownerId = property.ownerId;
     entity.createdAt = property.createdAt;
     entity.updatedAt = property.updatedAt;

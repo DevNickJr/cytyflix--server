@@ -14,6 +14,8 @@ import {
 import { notificationService } from "@/modules/notifications/notification.module";
 import { sendEmail } from "@/infrastructure/email";
 import { verificationApprovedEmail, verificationRejectedEmail } from "@/infrastructure/email/templates";
+import { verifyVNIN } from "@/infrastructure/identity/dojah";
+import env from "@/configs/env.config";
 import CustomError from "@/shared/utils/custom-error";
 
 export class AgentVerificationService {
@@ -31,10 +33,27 @@ export class AgentVerificationService {
       throw new CustomError("You are already a verified agent", 400);
     }
 
+    // Verify vNIN with Dojah if provided and Dojah is configured
+    let ninVerified = false;
+    let ninData: Record<string, unknown> | undefined;
+    if (dto.ninNumber && env.DOJAH_APP_ID && env.DOJAH_SECRET_KEY) {
+      try {
+        const result = await verifyVNIN(dto.ninNumber);
+        ninVerified = true;
+        ninData = result as unknown as Record<string, unknown>;
+      } catch (error: any) {
+        throw new CustomError(error.message || "NIN verification failed. Please check your Virtual NIN and try again.", 400);
+      }
+    }
+
     // If rejected, allow resubmission by updating existing
     if (existing && existing.status === VerificationStatus.REJECTED) {
       existing.idDocumentUrl = dto.idDocumentUrl;
       existing.selfieUrl = dto.selfieUrl;
+      existing.utilityBillUrl = dto.utilityBillUrl;
+      existing.ninNumber = dto.ninNumber;
+      existing.ninVerified = ninVerified;
+      existing.ninData = ninData;
       existing.status = VerificationStatus.PENDING;
       existing.rejectionReason = undefined;
       existing.reviewedBy = undefined;
@@ -47,6 +66,10 @@ export class AgentVerificationService {
       userId,
       dto.idDocumentUrl,
       dto.selfieUrl,
+      dto.utilityBillUrl,
+      dto.ninNumber,
+      ninVerified,
+      ninData,
     );
 
     return this.verificationRepo.create(verification);

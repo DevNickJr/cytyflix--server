@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { BookingService } from "../application/booking.service";
+import { generateICSContent } from "@/shared/utils/ics-generator";
+import { generateReceiptPDF } from "@/shared/utils/receipt-generator";
 
 export class BookingController {
   constructor(private readonly service: BookingService) {}
@@ -49,9 +51,36 @@ export class BookingController {
     }
   };
 
-  confirm = async (req: Request, res: Response, next: NextFunction) => {
+  agentConfirm = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const booking = await this.service.confirmMeeting(req.params.id as string, req.user!.id);
+      const booking = await this.service.agentConfirm(req.params.id as string, req.user!.id);
+      res.json({ success: true, data: booking });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  clientRelease = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const booking = await this.service.clientRelease(req.params.id as string, req.user!.id);
+      res.json({ success: true, data: booking });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateSchedule = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const booking = await this.service.updateSchedule(req.params.id as string, req.user!.id, req.body);
+      res.json({ success: true, data: booking });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  reject = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const booking = await this.service.rejectBooking(req.params.id as string, req.user!.id);
       res.json({ success: true, data: booking });
     } catch (error) {
       next(error);
@@ -62,6 +91,40 @@ export class BookingController {
     try {
       const booking = await this.service.cancelBooking(req.params.id as string, req.user!.id);
       res.json({ success: true, data: booking });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  downloadICS = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const booking = await this.service.getBooking(req.params.id as string, req.user!.id);
+
+      const ics = generateICSContent({
+        uid: `booking-${booking.id}@cytyflix.com`,
+        title: `CytyFlix Booking - ${booking.paymentReference}`,
+        description: `Property inspection booking. Reference: ${booking.paymentReference}`,
+        startDate: new Date(booking.scheduledDate),
+        startTime: booking.scheduledTime,
+        durationMinutes: 60,
+      });
+
+      res.setHeader("Content-Type", "text/calendar; charset=utf-8");
+      res.setHeader("Content-Disposition", `attachment; filename="booking-${booking.paymentReference}.ics"`);
+      res.send(ics);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  downloadReceipt = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const receiptData = await this.service.getReceiptData(req.params.id as string, req.user!.id);
+      const pdf = await generateReceiptPDF(receiptData);
+
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename="receipt-${receiptData.bookingReference}.pdf"`);
+      res.send(pdf);
     } catch (error) {
       next(error);
     }

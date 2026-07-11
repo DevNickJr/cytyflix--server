@@ -8,6 +8,10 @@ export class AgentVerificationMapper {
       entity.userId,
       entity.idDocumentUrl,
       entity.selfieUrl,
+      entity.utilityBillUrl || "",
+      entity.ninNumber,
+      entity.ninVerified ?? false,
+      entity.ninData,
       entity.status as VerificationStatus,
       entity.rejectionReason,
       entity.reviewedBy,
@@ -23,6 +27,10 @@ export class AgentVerificationMapper {
     entity.userId = verification.userId;
     entity.idDocumentUrl = verification.idDocumentUrl;
     entity.selfieUrl = verification.selfieUrl;
+    entity.utilityBillUrl = verification.utilityBillUrl;
+    entity.ninNumber = verification.ninNumber;
+    entity.ninVerified = verification.ninVerified;
+    entity.ninData = verification.ninData;
     entity.status = verification.status;
     entity.rejectionReason = verification.rejectionReason;
     entity.reviewedBy = verification.reviewedBy;

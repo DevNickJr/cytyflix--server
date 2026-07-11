@@ -66,11 +66,20 @@ export class PropertyOrmEntity {
   @Column({ type: "jsonb", default: "[]" })
   streetImages!: string[];
 
+  @Column({ type: "text", nullable: true })
+  walkthroughVideo?: string;
+
   @Column({ default: true })
   isAvailable!: boolean;
 
   @Column({ default: false })
   isFeatured!: boolean;
+
+  @Column({ default: false })
+  isFrozen!: boolean;
+
+  @Column({ type: "text", nullable: true })
+  frozenReason?: string;
 
   @Column()
   ownerId!: string;

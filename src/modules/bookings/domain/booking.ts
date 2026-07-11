@@ -6,6 +6,7 @@ export enum PaymentStatus {
 
 export enum BookingStatus {
   PENDING = "pending",
+  AWAITING_AGENT_CONFIRMATION = "awaiting_agent_confirmation",
   CONFIRMED = "confirmed",
   COMPLETED = "completed",
   DISPUTED = "disputed",

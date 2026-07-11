@@ -1,4 +1,4 @@
-import { Repository, MoreThan } from "typeorm";
+import { Repository, LessThan } from "typeorm";
 import { BookingRepository } from "../../contracts/booking.interfaces";
 import { Booking, BookingStatus, PaymentStatus } from "../../domain/booking";
 import { PaginatedResult } from "@/modules/properties/contracts/property.interfaces";
@@ -69,13 +69,14 @@ export class BookingRepositoryImpl implements BookingRepository {
 
   async findExpiredBookings(): Promise<Booking[]> {
     const now = new Date();
-    const fortyEightHoursAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
+    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
     const entities = await this.ormRepo.find({
       where: {
         paymentStatus: PaymentStatus.PAID,
         bookingStatus: BookingStatus.CONFIRMED,
-        scheduledDate: MoreThan(fortyEightHoursAgo),
+        clientConfirmed: false,
+        scheduledDate: LessThan(twentyFourHoursAgo),
       },
     });
 

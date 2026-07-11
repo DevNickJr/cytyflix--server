@@ -15,6 +15,18 @@ export class AgentVerificationOrmEntity {
   @Column()
   selfieUrl!: string;
 
+  @Column({ nullable: true })
+  utilityBillUrl?: string;
+
+  @Column({ type: "text", nullable: true })
+  ninNumber?: string;
+
+  @Column({ default: false })
+  ninVerified!: boolean;
+
+  @Column({ type: "jsonb", nullable: true })
+  ninData?: Record<string, unknown>;
+
   @Column({ default: "pending" })
   status!: string;
 

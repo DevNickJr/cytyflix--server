@@ -4,6 +4,8 @@ export const SubmitVerificationSchema = z.object({
   body: z.object({
     idDocumentUrl: z.string().url("Valid ID document URL is required"),
     selfieUrl: z.string().url("Valid selfie URL is required"),
+    utilityBillUrl: z.string().url("Valid utility bill URL is required"),
+    ninNumber: z.string().length(16, "Virtual NIN must be exactly 16 characters").optional(),
   }),
 });
 

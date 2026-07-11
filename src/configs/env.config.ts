@@ -49,6 +49,14 @@ const envSchema = z.object({
 
   // RabbitMQ
   RABBITMQ_URL: z.string().default(''),
+
+  // Dojah (NIN Verification)
+  DOJAH_APP_ID: z.string().default(''),
+  DOJAH_SECRET_KEY: z.string().default(''),
+  DOJAH_BASE_URL: z.string().default('https://api.dojah.io'),
+
+  // App
+  APP_URL: z.string().default('http://localhost:4001'),
 });
 
 const parsed = envSchema.safeParse(process.env);

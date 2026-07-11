@@ -93,6 +93,9 @@ export class PropertyRepositoryImpl implements PropertyRepository {
       qb.andWhere("property.isAvailable = :isAvailable", { isAvailable: filters.isAvailable });
     }
 
+    // Always exclude frozen properties from public search
+    qb.andWhere("property.isFrozen = :isFrozen", { isFrozen: false });
+
     if (filters.amenities && filters.amenities.length > 0) {
       // PostgreSQL JSONB containment: amenities column contains all requested amenities
       qb.andWhere("property.amenities @> :amenities", {
