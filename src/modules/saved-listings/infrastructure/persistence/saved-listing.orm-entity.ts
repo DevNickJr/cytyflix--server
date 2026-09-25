@@ -16,10 +16,10 @@ export class SavedListingOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   userId!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   propertyId!: string;
 
   @ManyToOne(() => UserOrmEntity)

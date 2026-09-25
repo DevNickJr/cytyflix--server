@@ -13,19 +13,19 @@ export class NotificationOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   userId!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   type!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   title!: string;
 
   @Column({ type: 'text' })
   message!: string;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isRead!: boolean;
 
   @Column({ type: 'jsonb', default: '{}' })

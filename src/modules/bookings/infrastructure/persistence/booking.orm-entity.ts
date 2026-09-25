@@ -15,37 +15,37 @@ export class BookingOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   clientId!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   agentId!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   propertyId!: string | null;
 
   @Column({ type: 'decimal' })
   amount!: number;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true, nullable: false })
   paymentReference!: string;
 
-  @Column({ default: 'pending' })
+  @Column({ type: 'varchar', nullable: false })
   paymentStatus!: string;
 
-  @Column({ default: 'pending' })
+  @Column({ type: 'varchar', nullable: false })
   bookingStatus!: string;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   clientConfirmed!: boolean;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   agentConfirmed!: boolean;
 
   @Column({ type: 'timestamp', nullable: true })
   scheduledDate!: Date;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   scheduledTime!: string;
 
   @Column({ type: 'text', nullable: true })

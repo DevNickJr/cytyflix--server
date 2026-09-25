@@ -14,7 +14,7 @@ export class WalletOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   userId!: string;
 
   @Column({ type: 'decimal', default: 0 })

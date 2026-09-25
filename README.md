@@ -1,5 +1,5 @@
-
 ## CytyFlix
+
 A modern housing discovery platform designed to simplify and personalize the property rental experience, starting with Lagos and expanding globally.
 
 ---
@@ -35,16 +35,16 @@ The platform aims to reduce the stress, inefficiency, and lack of transparency c
 
 # Tech Stack
 
-| Layer | Technology |
-| --- | --- |
-| Frontend | Next.js |
-| Backend | Express.js |
-| Database | PostgreSQL |
-| Authentication | JWT |
-| Media Storage | Cloud Object Storage |
-| Queue System | Redis/BullMQ |
-| Deployment | Docker |
-| Hosting | Vercel + Cloud Infrastructure |
+| Layer          | Technology                    |
+| -------------- | ----------------------------- |
+| Frontend       | Next.js                       |
+| Backend        | Express.js                    |
+| Database       | PostgreSQL                    |
+| Authentication | JWT                           |
+| Media Storage  | Cloud Object Storage          |
+| Queue System   | Redis/BullMQ                  |
+| Deployment     | Docker                        |
+| Hosting        | Vercel + Cloud Infrastructure |
 
 ---
 
@@ -155,6 +155,12 @@ CLOUD_STORAGE_KEYS=
 
 ```bash
 npm run migrate
+```
+
+```bash
+npm run migration:generate -- src/db/migrations/AddVideoColumn
+npm run migration:run
+
 ```
 
 ---
@@ -307,8 +313,8 @@ Engineering principles:
 
 Internal/Private Project
 
-
 # TODO
+
 [ ] - aGENT PAGE, maybe a subdomain (so they will have something to share on socials that contains all their listings)
 [ ] - share feature to socials (agents page and properties and show thumbnail)
 [ ] - pin properties on agents page

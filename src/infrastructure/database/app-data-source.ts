@@ -13,5 +13,6 @@ export const AppDataSource = new DataSource({
       '/../../modules/**/infrastructure/persistence/*.orm-entity.{js,ts}',
   ],
   logging: env.NODE_ENV === 'development',
-  synchronize: true,
+  synchronize: env.NODE_ENV === 'development',
+  migrations: [__dirname + '/../../migrations/**/*.ts'], // Where migration files will be saved
 });

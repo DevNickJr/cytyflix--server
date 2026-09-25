@@ -17,10 +17,10 @@ export class ReviewOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   userId!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   propertyId!: string;
 
   @Column({ type: 'int' })

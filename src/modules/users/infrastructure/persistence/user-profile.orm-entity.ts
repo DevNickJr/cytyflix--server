@@ -12,19 +12,19 @@ export class UserProfileOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   firstName?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   lastName?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   phoneNumber?: string;
 
   @Column({ type: 'text', nullable: true })
   bio?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   preferredLocation?: string;
 
   @Column({ type: 'decimal', nullable: true })
@@ -33,7 +33,11 @@ export class UserProfileOrmEntity {
   @Column({ type: 'decimal', nullable: true })
   budgetMax?: number;
 
-  @Column({ nullable: true, default: 'https://cytyflix.com/dummy-man.png' })
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    default: 'https://cytyflix.com/dummy-man.png',
+  })
   profileImage?: string;
 
   // Native Postgres string arrays
@@ -46,13 +50,13 @@ export class UserProfileOrmEntity {
   @Column('text', { array: true, default: [] })
   operatingCities!: string[]; // e.g., ["Lagos", "Ikeja", "Abeokuta South"]
 
-  @Column({ unique: true, nullable: true })
+  @Column({ type: 'varchar', unique: true, nullable: true })
   slug?: string;
 
   @OneToOne(() => UserOrmEntity, user => user.profile)
   @JoinColumn()
   user!: UserOrmEntity;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   userId!: string;
 }

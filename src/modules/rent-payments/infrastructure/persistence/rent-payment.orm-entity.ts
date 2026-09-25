@@ -15,31 +15,31 @@ export class RentPaymentOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   propertyId!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   tenantId!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   ownerId!: string;
 
   @Column({ type: 'decimal' })
   amount!: number;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', nullable: false, unique: true })
   paymentReference!: string;
 
-  @Column({ default: 'pending' })
+  @Column({ type: 'varchar', nullable: false, default: 'pending' })
   paymentStatus!: string;
 
-  @Column({ default: 'pending' })
+  @Column({ type: 'varchar', nullable: false, default: 'pending' })
   status!: string;
 
   @Column({ type: 'timestamp' })
   moveInDate!: Date;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   tenantConfirmed!: boolean;
 
   @Column({ type: 'timestamp', nullable: true })

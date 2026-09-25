@@ -13,13 +13,13 @@ export class AnalyticsEventOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   eventType!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   targetId!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   userId?: string;
 
   @Column({ type: 'jsonb', nullable: true })

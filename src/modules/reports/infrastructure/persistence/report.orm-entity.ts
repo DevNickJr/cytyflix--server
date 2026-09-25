@@ -15,22 +15,22 @@ export class ReportOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   userId!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   propertyId!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   reason!: string;
 
   @Column({ type: 'text' })
   description!: string;
 
-  @Column({ default: 'pending' })
+  @Column({ type: 'varchar', default: 'pending' })
   status!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   reviewedBy?: string;
 
   @Column({ type: 'timestamp', nullable: true })

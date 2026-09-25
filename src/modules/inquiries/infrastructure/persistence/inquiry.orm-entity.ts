@@ -15,19 +15,19 @@ export class InquiryOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   senderId!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   propertyId!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   recipientId!: string;
 
   @Column({ type: 'text' })
   message!: string;
 
-  @Column({ default: 'pending' })
+  @Column({ type: 'varchar', nullable: false, default: 'pending' })
   status!: string;
 
   @ManyToOne(() => UserOrmEntity)

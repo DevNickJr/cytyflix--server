@@ -15,16 +15,16 @@ export class PropertyOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   title!: string;
 
   @Column({ type: 'text' })
   description!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   propertyType!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   listingType!: string;
 
   @Column({ type: 'decimal' })
@@ -36,22 +36,22 @@ export class PropertyOrmEntity {
   @Column({ type: 'boolean', default: false })
   negotiable!: boolean;
 
-  @Column({ default: 'NGN' })
+  @Column({ type: 'varchar', default: 'NGN' })
   currency!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   address!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   city!: string; // city or ward
 
-  @Column({ nullable: false })
+  @Column({ type: 'varchar', nullable: false })
   lga!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   state!: string;
 
-  @Column({ default: 'Nigeria' })
+  @Column({ type: 'varchar', nullable: false, default: 'Nigeria' })
   country!: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
@@ -87,19 +87,19 @@ export class PropertyOrmEntity {
   @Column({ type: 'text', nullable: true })
   walkthroughVideo?: string;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   isAvailable!: boolean;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isFeatured!: boolean;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isFrozen!: boolean;
 
   @Column({ type: 'text', nullable: true })
   frozenReason?: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   ownerId!: string;
 
   @ManyToOne(() => UserOrmEntity)

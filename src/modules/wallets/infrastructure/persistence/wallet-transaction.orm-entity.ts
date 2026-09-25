@@ -13,10 +13,10 @@ export class WalletTransactionOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   walletId!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   type!: string;
 
   @Column({ type: 'decimal' })
@@ -25,10 +25,10 @@ export class WalletTransactionOrmEntity {
   @Column({ type: 'decimal' })
   balanceAfter!: number;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   status!: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', nullable: false, unique: true })
   reference!: string;
 
   @Column({ type: 'text' })

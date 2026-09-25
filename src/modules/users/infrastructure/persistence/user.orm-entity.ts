@@ -14,21 +14,21 @@ export class UserOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', nullable: false, unique: true })
   email!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   password!: string;
 
   @Column({
-    // type: "enum",
-    // enum: RolesEnum,
+    type: 'varchar',
+    nullable: false,
     default: RolesEnum.RENT_SEEKER,
   })
   role!: string;
   // role!: RolesEnum;
 
-  @Column({ default: true }) // TODO: change this to false in production WHEN we set up email verification
+  @Column({ type: 'boolean', nullable: false, default: true }) // TODO: change this to false in production WHEN we set up email verification
   isVerified!: boolean;
 
   @OneToOne(() => UserProfileOrmEntity, profile => profile.user, {

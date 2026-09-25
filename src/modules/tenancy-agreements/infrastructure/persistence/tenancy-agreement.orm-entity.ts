@@ -15,13 +15,13 @@ export class TenancyAgreementOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   propertyId!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   landlordId!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   tenantId!: string;
 
   @Column({ type: 'text' })
@@ -39,7 +39,7 @@ export class TenancyAgreementOrmEntity {
   @Column({ type: 'timestamp', nullable: true })
   tenantSignedAt!: Date | null;
 
-  @Column({ default: 'pending_tenant' })
+  @Column({ type: 'varchar', nullable: false, default: 'pending_tenant' })
   status!: string;
 
   @ManyToOne(() => UserOrmEntity)

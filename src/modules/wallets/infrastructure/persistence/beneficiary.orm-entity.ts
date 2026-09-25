@@ -13,22 +13,22 @@ export class BeneficiaryOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   userId!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   bankCode!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   bankName!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   accountNumber!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   accountName!: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   recipientCode!: string;
 
   @ManyToOne(() => UserOrmEntity)
