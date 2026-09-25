@@ -1,5 +1,5 @@
-import { Inquiry, InquiryStatus } from "../../domain/inquiry";
-import { InquiryOrmEntity } from "./inquiry.orm-entity";
+import { Inquiry, InquiryStatus } from '../../domain/inquiry';
+import { InquiryOrmEntity } from './inquiry.orm-entity';
 
 export class InquiryMapper {
   static toDomain(entity: InquiryOrmEntity): Inquiry {
@@ -11,7 +11,7 @@ export class InquiryMapper {
       entity.message,
       entity.status as InquiryStatus,
       entity.createdAt,
-      entity.updatedAt,
+      entity.updatedAt
     );
   }
 

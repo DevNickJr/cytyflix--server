@@ -1,26 +1,29 @@
-import { User, UserProfile } from "@/modules/users/domain/user";
-import { UserRepository, RolesEnum, SearchByLocationQuery } from "@/modules/users/contracts/user.interfaces";
-import { PropertyRepository } from "@/modules/properties/contracts/property.interfaces";
-import { CreateUserDTO } from "@/modules/auth/contracts/auth.schemas";
-import { UpdateProfileDTO, UpdateRoleDTO } from "@/modules/users/contracts/user.schemas";
-import { generateSlug, validateSlug } from "@/shared/utils/slugify";
-import CustomError from "@/shared/utils/custom-error";
+import { User, UserProfile } from '@/modules/users/domain/user';
+import {
+  UserRepository,
+  RolesEnum,
+  SearchByLocationQuery,
+} from '@/modules/users/contracts/user.interfaces';
+import { PropertyRepository } from '@/modules/properties/contracts/property.interfaces';
+import { CreateUserDTO } from '@/modules/auth/contracts/auth.schemas';
+import {
+  UpdateProfileDTO,
+  UpdateRoleDTO,
+} from '@/modules/users/contracts/user.schemas';
+import { generateSlug, validateSlug } from '@/shared/utils/slugify';
+import CustomError from '@/shared/utils/custom-error';
 
 export class UserService {
   constructor(
     private readonly userRepo: UserRepository,
-    private readonly propertyRepo: PropertyRepository,
+    private readonly propertyRepo: PropertyRepository
   ) {}
 
   async createUser(dto: CreateUserDTO) {
     const existing = await this.userRepo.findByEmail(dto.email);
-    if (existing) throw new Error("User already exists");
+    if (existing) throw new Error('User already exists');
 
-    const user = new User(
-      crypto.randomUUID(),
-      dto.email,
-      dto.password,
-    );
+    const user = new User(crypto.randomUUID(), dto.email, dto.password);
 
     return this.userRepo.create(user);
   }
@@ -32,10 +35,10 @@ export class UserService {
   async getUserByEmail(email: string) {
     return this.userRepo.findByEmail(email);
   }
-  
+
   async getProfile(userId: string) {
     const user = await this.userRepo.findById(userId);
-    if (!user) throw new Error("User not found");
+    if (!user) throw new Error('User not found');
 
     return {
       id: user.id,
@@ -49,9 +52,9 @@ export class UserService {
 
   async updateProfile(userId: string, dto: UpdateProfileDTO) {
     const user = await this.userRepo.findById(userId);
-    if (!user) throw new Error("User not found");
+    if (!user) throw new Error('User not found');
 
-    const currentProfile = user.profile || new UserProfile("", "", "", "");
+    const currentProfile = user.profile || new UserProfile('', '', '', '');
 
     const firstName = dto.firstName ?? currentProfile.firstName;
     const lastName = dto.lastName ?? currentProfile.lastName;
@@ -75,15 +78,18 @@ export class UserService {
       dto.operatingStates ?? currentProfile.operatingStates,
       dto.operatingLgas ?? currentProfile.operatingLgas,
       dto.operatingCities ?? currentProfile.operatingCities,
-      slug,
+      slug
     );
 
     return this.userRepo.update(user);
   }
 
-  private async generateUniqueSlug(firstName: string, lastName: string): Promise<string> {
+  private async generateUniqueSlug(
+    firstName: string,
+    lastName: string
+  ): Promise<string> {
     const baseSlug = generateSlug(firstName, lastName);
-    if (!baseSlug) return "";
+    if (!baseSlug) return '';
 
     let slug = baseSlug;
     let counter = 1;
@@ -96,18 +102,21 @@ export class UserService {
 
   async updateSlug(userId: string, newSlug: string) {
     if (!validateSlug(newSlug)) {
-      throw new CustomError("Invalid slug format. Must be 3-50 characters, lowercase alphanumeric with hyphens.", 400);
+      throw new CustomError(
+        'Invalid slug format. Must be 3-50 characters, lowercase alphanumeric with hyphens.',
+        400
+      );
     }
 
     const existing = await this.userRepo.findBySlug(newSlug);
     if (existing && existing.id !== userId) {
-      throw new CustomError("This slug is already taken", 409);
+      throw new CustomError('This slug is already taken', 409);
     }
 
     const user = await this.userRepo.findById(userId);
-    if (!user) throw new CustomError("User not found", 404);
+    if (!user) throw new CustomError('User not found', 404);
 
-    const currentProfile = user.profile || new UserProfile("", "", "", "");
+    const currentProfile = user.profile || new UserProfile('', '', '', '');
     user.profile = new UserProfile(
       currentProfile.id || crypto.randomUUID(),
       currentProfile.firstName,
@@ -121,7 +130,7 @@ export class UserService {
       currentProfile.operatingStates,
       currentProfile.operatingLgas,
       currentProfile.operatingCities,
-      newSlug,
+      newSlug
     );
 
     return this.userRepo.update(user);
@@ -129,8 +138,9 @@ export class UserService {
 
   async getAgentBySlug(slug: string) {
     const user = await this.userRepo.findBySlug(slug);
-    if (!user) throw new CustomError("Agent not found", 404);
-    if (user.role !== RolesEnum.AGENT) throw new CustomError("User is not an agent", 404);
+    if (!user) throw new CustomError('Agent not found', 404);
+    if (user.role !== RolesEnum.AGENT)
+      throw new CustomError('User is not an agent', 404);
 
     return {
       id: user.id,
@@ -145,7 +155,7 @@ export class UserService {
     const result = await this.userRepo.findByRole(RolesEnum.AGENT, query);
     return {
       ...result,
-      data: result.data.map((user) => ({
+      data: result.data.map(user => ({
         id: user.id,
         email: user.email,
         role: user.role,
@@ -157,8 +167,9 @@ export class UserService {
 
   async getAgent(id: string) {
     const user = await this.userRepo.findById(id);
-    if (!user) throw new CustomError("Agent not found", 404);
-    if (user.role !== RolesEnum.AGENT) throw new CustomError("User is not an agent", 404);
+    if (!user) throw new CustomError('Agent not found', 404);
+    if (user.role !== RolesEnum.AGENT)
+      throw new CustomError('User is not an agent', 404);
 
     return {
       id: user.id,
@@ -171,20 +182,25 @@ export class UserService {
 
   async getAgentProperties(agentId: string, query: SearchByLocationQuery) {
     const user = await this.userRepo.findById(agentId);
-    if (!user) throw new CustomError("Agent not found", 404);
-    if (user.role !== RolesEnum.AGENT) throw new CustomError("User is not an agent", 404);
+    if (!user) throw new CustomError('Agent not found', 404);
+    if (user.role !== RolesEnum.AGENT)
+      throw new CustomError('User is not an agent', 404);
 
     return this.propertyRepo.findByOwnerId(agentId, query);
   }
 
   async updateRole(userId: string, dto: UpdateRoleDTO) {
     const admin = await this.userRepo.findById(userId);
-    if (!admin) throw new Error("User not found");
+    if (!admin) throw new Error('User not found');
 
-    if (admin.role !== RolesEnum.ADMIN) throw new CustomError("You are not authorized to perform this actiion ", 401);
+    if (admin.role !== RolesEnum.ADMIN)
+      throw new CustomError(
+        'You are not authorized to perform this actiion ',
+        401
+      );
 
     const user = await this.userRepo.findById(dto.userId);
-    if (!user) throw new Error("User does not exist");
+    if (!user) throw new Error('User does not exist');
 
     user.role = dto.role;
 

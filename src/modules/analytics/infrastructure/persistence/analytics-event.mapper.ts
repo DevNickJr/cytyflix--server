@@ -1,5 +1,5 @@
-import { AnalyticsEvent, EventType } from "../../domain/analytics-event";
-import { AnalyticsEventOrmEntity } from "./analytics-event.orm-entity";
+import { AnalyticsEvent, EventType } from '../../domain/analytics-event';
+import { AnalyticsEventOrmEntity } from './analytics-event.orm-entity';
 
 export class AnalyticsEventMapper {
   static toDomain(entity: AnalyticsEventOrmEntity): AnalyticsEvent {
@@ -9,7 +9,7 @@ export class AnalyticsEventMapper {
       entity.targetId,
       entity.userId,
       entity.metadata,
-      entity.createdAt,
+      entity.createdAt
     );
   }
 

@@ -7,8 +7,14 @@ interface AgreementTemplateData {
   startDate?: string;
 }
 
-export function getDefaultAgreementTemplate(data: AgreementTemplateData): string {
-  const today = new Date().toLocaleDateString("en-NG", { year: "numeric", month: "long", day: "numeric" });
+export function getDefaultAgreementTemplate(
+  data: AgreementTemplateData
+): string {
+  const today = new Date().toLocaleDateString('en-NG', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 
   return `TENANCY AGREEMENT
 
@@ -28,7 +34,7 @@ PROPERTY DETAILS:
 Property: ${data.propertyTitle}
 Address: ${data.propertyAddress}
 Monthly Rent: ${data.monthlyRent}
-${data.startDate ? `Commencement Date: ${data.startDate}` : ""}
+${data.startDate ? `Commencement Date: ${data.startDate}` : ''}
 
 TERMS AND CONDITIONS:
 

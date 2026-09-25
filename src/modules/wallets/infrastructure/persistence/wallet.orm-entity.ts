@@ -1,19 +1,27 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { UserOrmEntity } from "@/modules/users/infrastructure/persistence/user.orm-entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { UserOrmEntity } from '@/modules/users/infrastructure/persistence/user.orm-entity';
 
-@Entity("wallets")
+@Entity('wallets')
 export class WalletOrmEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column({ unique: true })
   userId!: string;
 
-  @Column({ type: "decimal", default: 0 })
+  @Column({ type: 'decimal', default: 0 })
   balance!: number;
 
   @ManyToOne(() => UserOrmEntity)
-  @JoinColumn({ name: "userId" })
+  @JoinColumn({ name: 'userId' })
   user!: UserOrmEntity;
 
   @CreateDateColumn()

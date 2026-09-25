@@ -1,6 +1,6 @@
-import { User } from "@/modules/users/domain/user";
-import { PaginatedResult } from "@/modules/properties/contracts/property.interfaces";
-import z from "zod";
+import { User } from '@/modules/users/domain/user';
+import { PaginatedResult } from '@/modules/properties/contracts/property.interfaces';
+import z from 'zod';
 
 export interface UserRepository {
   create(user: User): Promise<User>;
@@ -8,15 +8,18 @@ export interface UserRepository {
   findByEmail(email: string): Promise<User | null>;
   findBySlug(slug: string): Promise<User | null>;
   slugExists(slug: string): Promise<boolean>;
-  findByRole(role: string, query: SearchByLocationQuery): Promise<PaginatedResult<User>>;
+  findByRole(
+    role: string,
+    query: SearchByLocationQuery
+  ): Promise<PaginatedResult<User>>;
   update(user: User): Promise<User>;
 }
 
 export enum RolesEnum {
-  RENT_SEEKER = "rent_seeker",
-  PROPERTY_OWNER = "property_owner",
-  AGENT = "agent",
-  ADMIN = "admin",
+  RENT_SEEKER = 'rent_seeker',
+  PROPERTY_OWNER = 'property_owner',
+  AGENT = 'agent',
+  ADMIN = 'admin',
 }
 
 export const SearchByLocationQuerySchema = z.object({
@@ -24,7 +27,8 @@ export const SearchByLocationQuerySchema = z.object({
     city: z.string().optional(),
     lga: z.string().optional(),
     state: z.string().optional(),
-    page: z.string({ error: 'page must be a number' })
+    page: z
+      .string({ error: 'page must be a number' })
       .refine(val => parseInt(val || '1'))
       .transform(val => parseInt(val || '1', 10)) // convert string → number
       .pipe(
@@ -35,7 +39,8 @@ export const SearchByLocationQuerySchema = z.object({
       )
       .optional()
       .default(1),
-    limit: z.string({ error: 'limit must be a number' })
+    limit: z
+      .string({ error: 'limit must be a number' })
       .refine(val => parseInt(val || '1'))
       .transform(val => parseInt(val || '1', 10)) // convert string → number
       .pipe(
@@ -46,9 +51,11 @@ export const SearchByLocationQuerySchema = z.object({
       )
       .optional()
       .default(1),
-    sortBy: z.enum(["createdAt"]).default("createdAt").optional(),
-    sortOrder: z.enum(["ASC", "DESC"]).default("DESC").optional(),
-  })
+    sortBy: z.enum(['createdAt']).default('createdAt').optional(),
+    sortOrder: z.enum(['ASC', 'DESC']).default('DESC').optional(),
+  }),
 });
 
-export type SearchByLocationQuery = z.infer<typeof SearchByLocationQuerySchema>["query"];
+export type SearchByLocationQuery = z.infer<
+  typeof SearchByLocationQuerySchema
+>['query'];

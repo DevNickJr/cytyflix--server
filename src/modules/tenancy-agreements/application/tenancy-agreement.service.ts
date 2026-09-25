@@ -1,46 +1,62 @@
-import crypto from "crypto";
-import { TenancyAgreement, AgreementStatus } from "../domain/tenancy-agreement";
-import { TenancyAgreementRepository } from "../contracts/tenancy-agreement.interfaces";
-import { CreateAgreementDTO, SignAgreementDTO } from "../contracts/tenancy-agreement.schemas";
-import { UserRepository } from "@/modules/users/contracts/user.interfaces";
-import { PropertyRepository } from "@/modules/properties/contracts/property.interfaces";
-import { rabbitMQ } from "@/infrastructure/messaging/rabbitmq";
-import { publishEvent } from "@/infrastructure/messaging/event-bus";
-import { AGREEMENT_CREATED, AGREEMENT_SIGNED } from "@/infrastructure/messaging/events";
-import { notificationService } from "@/modules/notifications/notification.module";
-import { sendEmail } from "@/infrastructure/email";
-import { agreementCreatedEmail, agreementSignedEmail } from "@/infrastructure/email/templates";
-import { generateAgreementPDF } from "@/shared/utils/agreement-pdf-generator";
-import CustomError from "@/shared/utils/custom-error";
+import crypto from 'crypto';
+import { TenancyAgreement, AgreementStatus } from '../domain/tenancy-agreement';
+import { TenancyAgreementRepository } from '../contracts/tenancy-agreement.interfaces';
+import {
+  CreateAgreementDTO,
+  SignAgreementDTO,
+} from '../contracts/tenancy-agreement.schemas';
+import { UserRepository } from '@/modules/users/contracts/user.interfaces';
+import { PropertyRepository } from '@/modules/properties/contracts/property.interfaces';
+import { rabbitMQ } from '@/infrastructure/messaging/rabbitmq';
+import { publishEvent } from '@/infrastructure/messaging/event-bus';
+import {
+  AGREEMENT_CREATED,
+  AGREEMENT_SIGNED,
+} from '@/infrastructure/messaging/events';
+import { notificationService } from '@/modules/notifications/notification.module';
+import { sendEmail } from '@/infrastructure/email';
+import {
+  agreementCreatedEmail,
+  agreementSignedEmail,
+} from '@/infrastructure/email/templates';
+import { generateAgreementPDF } from '@/shared/utils/agreement-pdf-generator';
+import CustomError from '@/shared/utils/custom-error';
 
 export class TenancyAgreementService {
   constructor(
     private readonly agreementRepo: TenancyAgreementRepository,
     private readonly userRepo: UserRepository,
-    private readonly propertyRepo: PropertyRepository,
+    private readonly propertyRepo: PropertyRepository
   ) {}
 
-  private getUserName(user: { profile?: { firstName?: string; lastName?: string } | null }): string {
-    return user.profile ? `${user.profile.firstName || ""} ${user.profile.lastName || ""}`.trim() : "User";
+  private getUserName(user: {
+    profile?: { firstName?: string; lastName?: string } | null;
+  }): string {
+    return user.profile
+      ? `${user.profile.firstName || ''} ${user.profile.lastName || ''}`.trim()
+      : 'User';
   }
 
   async create(landlordId: string, dto: CreateAgreementDTO) {
     const property = await this.propertyRepo.findById(dto.propertyId);
-    if (!property) throw new CustomError("Property not found", 404);
+    if (!property) throw new CustomError('Property not found', 404);
 
     if (property.ownerId !== landlordId) {
-      throw new CustomError("Only the property owner can create a tenancy agreement", 403);
+      throw new CustomError(
+        'Only the property owner can create a tenancy agreement',
+        403
+      );
     }
 
     if (landlordId === dto.tenantId) {
-      throw new CustomError("Cannot create an agreement with yourself", 400);
+      throw new CustomError('Cannot create an agreement with yourself', 400);
     }
 
     const tenant = await this.userRepo.findById(dto.tenantId);
-    if (!tenant) throw new CustomError("Tenant not found", 404);
+    if (!tenant) throw new CustomError('Tenant not found', 404);
 
     const landlord = await this.userRepo.findById(landlordId);
-    if (!landlord) throw new CustomError("Landlord not found", 404);
+    if (!landlord) throw new CustomError('Landlord not found', 404);
 
     const agreement = new TenancyAgreement(
       crypto.randomUUID(),
@@ -52,7 +68,7 @@ export class TenancyAgreementService {
       null,
       null,
       null,
-      AgreementStatus.PENDING_TENANT,
+      AgreementStatus.PENDING_TENANT
     );
 
     const saved = await this.agreementRepo.create(agreement);
@@ -61,7 +77,7 @@ export class TenancyAgreementService {
     const tenantName = this.getUserName(tenant);
 
     if (rabbitMQ.isConnected()) {
-      publishEvent("agreement.created", {
+      publishEvent('agreement.created', {
         type: AGREEMENT_CREATED,
         payload: {
           agreementId: saved.id,
@@ -78,8 +94,8 @@ export class TenancyAgreementService {
     } else {
       await notificationService.createNotification({
         userId: dto.tenantId,
-        type: "system",
-        title: "New Tenancy Agreement",
+        type: 'system',
+        title: 'New Tenancy Agreement',
         message: `${landlordName} has created a tenancy agreement for you to review and sign.`,
         metadata: { agreementId: saved.id },
       });
@@ -92,23 +108,27 @@ export class TenancyAgreementService {
         });
         await sendEmail({ to: tenant.email, ...template });
       } catch (emailError) {
-        console.error("Fallback email send failed:", emailError);
+        console.error('Fallback email send failed:', emailError);
       }
     }
 
     return saved;
   }
 
-  async signAsLandlord(agreementId: string, userId: string, dto: SignAgreementDTO) {
+  async signAsLandlord(
+    agreementId: string,
+    userId: string,
+    dto: SignAgreementDTO
+  ) {
     const agreement = await this.agreementRepo.findById(agreementId);
-    if (!agreement) throw new CustomError("Agreement not found", 404);
+    if (!agreement) throw new CustomError('Agreement not found', 404);
 
     if (agreement.landlordId !== userId) {
-      throw new CustomError("Only the landlord can sign as landlord", 403);
+      throw new CustomError('Only the landlord can sign as landlord', 403);
     }
 
     if (agreement.landlordSignature) {
-      throw new CustomError("Landlord has already signed this agreement", 400);
+      throw new CustomError('Landlord has already signed this agreement', 400);
     }
 
     agreement.landlordSignature = dto.signatureUrl;
@@ -125,16 +145,20 @@ export class TenancyAgreementService {
     return updated;
   }
 
-  async signAsTenant(agreementId: string, userId: string, dto: SignAgreementDTO) {
+  async signAsTenant(
+    agreementId: string,
+    userId: string,
+    dto: SignAgreementDTO
+  ) {
     const agreement = await this.agreementRepo.findById(agreementId);
-    if (!agreement) throw new CustomError("Agreement not found", 404);
+    if (!agreement) throw new CustomError('Agreement not found', 404);
 
     if (agreement.tenantId !== userId) {
-      throw new CustomError("Only the tenant can sign as tenant", 403);
+      throw new CustomError('Only the tenant can sign as tenant', 403);
     }
 
     if (agreement.tenantSignature) {
-      throw new CustomError("Tenant has already signed this agreement", 400);
+      throw new CustomError('Tenant has already signed this agreement', 400);
     }
 
     agreement.tenantSignature = dto.signatureUrl;
@@ -162,7 +186,7 @@ export class TenancyAgreementService {
     const tenantName = this.getUserName(tenant);
 
     if (rabbitMQ.isConnected()) {
-      publishEvent("agreement.signed", {
+      publishEvent('agreement.signed', {
         type: AGREEMENT_SIGNED,
         payload: {
           agreementId: agreement.id,
@@ -178,15 +202,15 @@ export class TenancyAgreementService {
     } else {
       await notificationService.createNotification({
         userId: agreement.landlordId,
-        type: "system",
-        title: "Agreement Fully Signed",
+        type: 'system',
+        title: 'Agreement Fully Signed',
         message: `Your tenancy agreement with ${tenantName} has been signed by both parties.`,
         metadata: { agreementId: agreement.id },
       });
       await notificationService.createNotification({
         userId: agreement.tenantId,
-        type: "system",
-        title: "Agreement Fully Signed",
+        type: 'system',
+        title: 'Agreement Fully Signed',
         message: `Your tenancy agreement with ${landlordName} has been signed by both parties.`,
         metadata: { agreementId: agreement.id },
       });
@@ -196,17 +220,17 @@ export class TenancyAgreementService {
         await sendEmail({ to: landlord.email, ...template });
         await sendEmail({ to: tenant.email, ...template });
       } catch (emailError) {
-        console.error("Fallback email send failed:", emailError);
+        console.error('Fallback email send failed:', emailError);
       }
     }
   }
 
   async getAgreement(agreementId: string, userId: string) {
     const agreement = await this.agreementRepo.findById(agreementId);
-    if (!agreement) throw new CustomError("Agreement not found", 404);
+    if (!agreement) throw new CustomError('Agreement not found', 404);
 
     if (agreement.landlordId !== userId && agreement.tenantId !== userId) {
-      throw new CustomError("You are not a participant of this agreement", 403);
+      throw new CustomError('You are not a participant of this agreement', 403);
     }
 
     return agreement;
@@ -218,17 +242,17 @@ export class TenancyAgreementService {
 
   async downloadPDF(agreementId: string, userId: string) {
     const agreement = await this.agreementRepo.findById(agreementId);
-    if (!agreement) throw new CustomError("Agreement not found", 404);
+    if (!agreement) throw new CustomError('Agreement not found', 404);
 
     if (agreement.landlordId !== userId && agreement.tenantId !== userId) {
-      throw new CustomError("You are not a participant of this agreement", 403);
+      throw new CustomError('You are not a participant of this agreement', 403);
     }
 
     const landlord = await this.userRepo.findById(agreement.landlordId);
     const tenant = await this.userRepo.findById(agreement.tenantId);
 
-    const landlordName = landlord ? this.getUserName(landlord) : "Landlord";
-    const tenantName = tenant ? this.getUserName(tenant) : "Tenant";
+    const landlordName = landlord ? this.getUserName(landlord) : 'Landlord';
+    const tenantName = tenant ? this.getUserName(tenant) : 'Tenant';
 
     return generateAgreementPDF({
       agreementContent: agreement.agreementContent,

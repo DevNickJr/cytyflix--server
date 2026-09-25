@@ -2,9 +2,7 @@ import env from './env.config';
 
 const otherHosts = env.ALLOWED_HOSTS?.split(',') || [];
 
-const whitelist = [
-  'https://cytyflix.com',
-]; // origins
+const whitelist = ['https://cytyflix.com']; // origins
 
 export const corsOptions = {
   origin: function originFn(
@@ -27,16 +25,20 @@ export const corsOptions = {
         otherHosts
           .map(o => o.toLowerCase().replace(/\/$/, ''))
           .includes(normalizedOrigin) ||
-        whitelist
-          .some(o => {
-            const val = o.toLowerCase().replace(/\/$/, '').replace('https://', '')
-            return normalizedOrigin.endsWith(val)
-          }) ||
-        otherHosts
-          .some(o => {
-            const val = o.toLowerCase().replace(/\/$/, '').replace('https://', '')
-            return normalizedOrigin.endsWith(val)
-          })
+        whitelist.some(o => {
+          const val = o
+            .toLowerCase()
+            .replace(/\/$/, '')
+            .replace('https://', '');
+          return normalizedOrigin.endsWith(val);
+        }) ||
+        otherHosts.some(o => {
+          const val = o
+            .toLowerCase()
+            .replace(/\/$/, '')
+            .replace('https://', '');
+          return normalizedOrigin.endsWith(val);
+        });
 
       if (allowed) {
         callback(null, true);

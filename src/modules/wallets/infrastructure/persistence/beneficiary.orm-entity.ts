@@ -1,9 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { UserOrmEntity } from "@/modules/users/infrastructure/persistence/user.orm-entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { UserOrmEntity } from '@/modules/users/infrastructure/persistence/user.orm-entity';
 
-@Entity("beneficiaries")
+@Entity('beneficiaries')
 export class BeneficiaryOrmEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column()
@@ -25,7 +32,7 @@ export class BeneficiaryOrmEntity {
   recipientCode!: string;
 
   @ManyToOne(() => UserOrmEntity)
-  @JoinColumn({ name: "userId" })
+  @JoinColumn({ name: 'userId' })
   user!: UserOrmEntity;
 
   @CreateDateColumn()

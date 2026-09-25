@@ -1,13 +1,13 @@
-import { Repository } from "typeorm";
-import { AgentVerificationRepository } from "../../contracts/agent-verification.interfaces";
-import { AgentVerification } from "../../domain/agent-verification";
-import { PaginatedResult } from "@/modules/properties/contracts/property.interfaces";
-import { AgentVerificationOrmEntity } from "./agent-verification.orm-entity";
-import { AgentVerificationMapper } from "./agent-verification.mapper";
+import { Repository } from 'typeorm';
+import { AgentVerificationRepository } from '../../contracts/agent-verification.interfaces';
+import { AgentVerification } from '../../domain/agent-verification';
+import { PaginatedResult } from '@/modules/properties/contracts/property.interfaces';
+import { AgentVerificationOrmEntity } from './agent-verification.orm-entity';
+import { AgentVerificationMapper } from './agent-verification.mapper';
 
 export class AgentVerificationRepositoryImpl implements AgentVerificationRepository {
   constructor(
-    private readonly ormRepo: Repository<AgentVerificationOrmEntity>,
+    private readonly ormRepo: Repository<AgentVerificationOrmEntity>
   ) {}
 
   async create(verification: AgentVerification): Promise<AgentVerification> {
@@ -31,14 +31,14 @@ export class AgentVerificationRepositoryImpl implements AgentVerificationReposit
   async findAll(
     status: string | undefined,
     page: number,
-    limit: number,
+    limit: number
   ): Promise<PaginatedResult<AgentVerification>> {
     const where: Record<string, string> = {};
     if (status) where.status = status;
 
     const [entities, total] = await this.ormRepo.findAndCount({
       where,
-      order: { createdAt: "DESC" },
+      order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
       relations: { user: { profile: true } },

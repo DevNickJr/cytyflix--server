@@ -1,12 +1,12 @@
 export enum TransactionType {
-  CREDIT = "credit",
-  DEBIT = "debit",
+  CREDIT = 'credit',
+  DEBIT = 'debit',
 }
 
 export enum TransactionStatus {
-  PENDING = "pending",
-  COMPLETED = "completed",
-  FAILED = "failed",
+  PENDING = 'pending',
+  COMPLETED = 'completed',
+  FAILED = 'failed',
 }
 
 export class Wallet {
@@ -15,7 +15,7 @@ export class Wallet {
     public userId: string,
     public balance: number,
     public createdAt: Date = new Date(),
-    public updatedAt: Date = new Date(),
+    public updatedAt: Date = new Date()
   ) {}
 }
 
@@ -28,7 +28,7 @@ export class Beneficiary {
     public accountNumber: string,
     public accountName: string,
     public recipientCode: string,
-    public createdAt: Date = new Date(),
+    public createdAt: Date = new Date()
   ) {}
 }
 
@@ -43,6 +43,6 @@ export class WalletTransaction {
     public reference: string,
     public description: string,
     public metadata: Record<string, any> = {},
-    public createdAt: Date = new Date(),
+    public createdAt: Date = new Date()
   ) {}
 }

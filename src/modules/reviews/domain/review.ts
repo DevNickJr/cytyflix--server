@@ -8,6 +8,6 @@ export class Review {
     public authorName?: string,
     public authorImage?: string,
     public createdAt: Date = new Date(),
-    public updatedAt: Date = new Date(),
+    public updatedAt: Date = new Date()
   ) {}
 }

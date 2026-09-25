@@ -1,5 +1,5 @@
-import { Review } from "../../domain/review";
-import { ReviewOrmEntity } from "./review.orm-entity";
+import { Review } from '../../domain/review';
+import { ReviewOrmEntity } from './review.orm-entity';
 
 export class ReviewMapper {
   static toDomain(entity: ReviewOrmEntity): Review {
@@ -10,11 +10,11 @@ export class ReviewMapper {
       entity.rating,
       entity.comment,
       entity.user?.profile
-        ? `${entity.user.profile.firstName || ""} ${entity.user.profile.lastName || ""}`.trim()
+        ? `${entity.user.profile.firstName || ''} ${entity.user.profile.lastName || ''}`.trim()
         : undefined,
       entity.user?.profile?.profileImage,
       entity.createdAt,
-      entity.updatedAt,
+      entity.updatedAt
     );
   }
 

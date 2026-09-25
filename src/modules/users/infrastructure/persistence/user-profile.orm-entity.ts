@@ -1,9 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from "typeorm";
-import { UserOrmEntity } from "./user.orm-entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
+import { UserOrmEntity } from './user.orm-entity';
 
-@Entity("user_profiles")
+@Entity('user_profiles')
 export class UserProfileOrmEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column({ nullable: true })
@@ -15,30 +21,30 @@ export class UserProfileOrmEntity {
   @Column({ nullable: true })
   phoneNumber?: string;
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: 'text', nullable: true })
   bio?: string;
 
   @Column({ nullable: true })
   preferredLocation?: string;
 
-  @Column({ type: "decimal", nullable: true })
+  @Column({ type: 'decimal', nullable: true })
   budgetMin?: number;
 
-  @Column({ type: "decimal", nullable: true })
+  @Column({ type: 'decimal', nullable: true })
   budgetMax?: number;
 
-  @Column({ nullable: true, default:"https://cytyflix.com/dummy-man.png" })
+  @Column({ nullable: true, default: 'https://cytyflix.com/dummy-man.png' })
   profileImage?: string;
 
   // Native Postgres string arrays
-  @Column("text", { array: true, default: [] })
+  @Column('text', { array: true, default: [] })
   operatingStates!: string[]; // e.g., ["Lagos", "Ogun"]
 
-  @Column("text", { array: true, default: [] })
-  operatingLgas!: string[];   // e.g., ["Eti-Osa", "Ikeja", "Abeokuta South"]
+  @Column('text', { array: true, default: [] })
+  operatingLgas!: string[]; // e.g., ["Eti-Osa", "Ikeja", "Abeokuta South"]
 
-  @Column("text", { array: true, default: [] })
-  operatingCities!: string[];  // e.g., ["Lagos", "Ikeja", "Abeokuta South"]
+  @Column('text', { array: true, default: [] })
+  operatingCities!: string[]; // e.g., ["Lagos", "Ikeja", "Abeokuta South"]
 
   @Column({ unique: true, nullable: true })
   slug?: string;

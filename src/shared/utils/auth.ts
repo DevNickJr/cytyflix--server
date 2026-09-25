@@ -1,17 +1,17 @@
 import * as jwt from 'jsonwebtoken';
-import env from "@/configs/env.config";
+import env from '@/configs/env.config';
 import { Request } from 'express';
 import { AccessTokenPayload } from '@/modules/auth/contracts/auth.interfaces';
 
 export const signJWT = ({
-    user,
-    rememberMe
+  user,
+  rememberMe,
 }: {
-  user: AccessTokenPayload,
-  rememberMe?: boolean,
+  user: AccessTokenPayload;
+  rememberMe?: boolean;
 }) => {
   const accessOptions = {
-    expiresIn: env.JWT_EXPIRATION || (12 * 60 * 60 * 1000), // half day by default
+    expiresIn: env.JWT_EXPIRATION || 12 * 60 * 60 * 1000, // half day by default
     audience: user.id,
   };
   const refreshOptions = {
@@ -21,14 +21,12 @@ export const signJWT = ({
   return {
     access: jwt.sign(user, env.JWT_SECRET, accessOptions),
     refresh: jwt.sign(user, env.JWT_SECRET, refreshOptions),
-  }
+  };
 };
 
-export const verifyJWT
- = (token: string) => {
-    return jwt.verify(token, env.JWT_SECRET) as AccessTokenPayload;
+export const verifyJWT = (token: string) => {
+  return jwt.verify(token, env.JWT_SECRET) as AccessTokenPayload;
 };
-
 
 export const extractTokenFromHeader = (
   request: Request
@@ -38,7 +36,7 @@ export const extractTokenFromHeader = (
 };
 
 export const extractFromCookie = (req: Request): string | null => {
-  let token: string | null =  null;
+  let token: string | null = null;
   if (req && req.cookies) {
     token = req.cookies['Authentication'];
   }

@@ -1,14 +1,12 @@
-import { Repository } from "typeorm";
-import { ReportRepository } from "../../contracts/report.interfaces";
-import { Report } from "../../domain/report";
-import { PaginatedResult } from "@/modules/properties/contracts/property.interfaces";
-import { ReportOrmEntity } from "./report.orm-entity";
-import { ReportMapper } from "./report.mapper";
+import { Repository } from 'typeorm';
+import { ReportRepository } from '../../contracts/report.interfaces';
+import { Report } from '../../domain/report';
+import { PaginatedResult } from '@/modules/properties/contracts/property.interfaces';
+import { ReportOrmEntity } from './report.orm-entity';
+import { ReportMapper } from './report.mapper';
 
 export class ReportRepositoryImpl implements ReportRepository {
-  constructor(
-    private readonly ormRepo: Repository<ReportOrmEntity>,
-  ) {}
+  constructor(private readonly ormRepo: Repository<ReportOrmEntity>) {}
 
   async create(report: Report): Promise<Report> {
     const entity = ReportMapper.toPersistence(report);
@@ -25,13 +23,17 @@ export class ReportRepositoryImpl implements ReportRepository {
     return ReportMapper.toDomain(entity);
   }
 
-  async findAll(status: string | undefined, page: number, limit: number): Promise<PaginatedResult<Report>> {
+  async findAll(
+    status: string | undefined,
+    page: number,
+    limit: number
+  ): Promise<PaginatedResult<Report>> {
     const where: Record<string, string> = {};
     if (status) where.status = status;
 
     const [entities, total] = await this.ormRepo.findAndCount({
       where,
-      order: { createdAt: "DESC" },
+      order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
       relations: { user: { profile: true }, property: true },
@@ -54,10 +56,10 @@ export class ReportRepositoryImpl implements ReportRepository {
 
   async countUniqueReporters(propertyId: string): Promise<number> {
     const result = await this.ormRepo
-      .createQueryBuilder("report")
-      .select("COUNT(DISTINCT report.userId)", "count")
-      .where("report.propertyId = :propertyId", { propertyId })
+      .createQueryBuilder('report')
+      .select('COUNT(DISTINCT report.userId)', 'count')
+      .where('report.propertyId = :propertyId', { propertyId })
       .getRawOne();
-    return parseInt(result?.count || "0", 10);
+    return parseInt(result?.count || '0', 10);
   }
 }

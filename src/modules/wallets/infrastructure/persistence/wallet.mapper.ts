@@ -1,7 +1,13 @@
-import { Wallet, WalletTransaction, Beneficiary, TransactionType, TransactionStatus } from "../../domain/wallet";
-import { WalletOrmEntity } from "./wallet.orm-entity";
-import { WalletTransactionOrmEntity } from "./wallet-transaction.orm-entity";
-import { BeneficiaryOrmEntity } from "./beneficiary.orm-entity";
+import {
+  Wallet,
+  WalletTransaction,
+  Beneficiary,
+  TransactionType,
+  TransactionStatus,
+} from '../../domain/wallet';
+import { WalletOrmEntity } from './wallet.orm-entity';
+import { WalletTransactionOrmEntity } from './wallet-transaction.orm-entity';
+import { BeneficiaryOrmEntity } from './beneficiary.orm-entity';
 
 export class WalletMapper {
   static toDomain(entity: WalletOrmEntity): Wallet {
@@ -10,7 +16,7 @@ export class WalletMapper {
       entity.userId,
       Number(entity.balance),
       entity.createdAt,
-      entity.updatedAt,
+      entity.updatedAt
     );
   }
 
@@ -35,7 +41,7 @@ export class BeneficiaryMapper {
       entity.accountNumber,
       entity.accountName,
       entity.recipientCode,
-      entity.createdAt,
+      entity.createdAt
     );
   }
 
@@ -65,7 +71,7 @@ export class WalletTransactionMapper {
       entity.reference,
       entity.description,
       entity.metadata,
-      entity.createdAt,
+      entity.createdAt
     );
   }
 

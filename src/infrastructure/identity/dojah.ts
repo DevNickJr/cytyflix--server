@@ -1,12 +1,12 @@
-import axios from "axios";
-import env from "@/configs/env.config";
+import axios from 'axios';
+import env from '@/configs/env.config';
 
 const dojahClient = axios.create({
   baseURL: env.DOJAH_BASE_URL,
   headers: {
     Authorization: env.DOJAH_SECRET_KEY,
     AppId: env.DOJAH_APP_ID,
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
 });
 
@@ -26,13 +26,15 @@ export interface DojahVNINResponse {
  * It expires after 72 hours and replaces raw 11-digit NIN for verification.
  */
 export async function verifyVNIN(vnin: string): Promise<DojahVNINResponse> {
-  try {
-    const response = await dojahClient.get("/api/v1/kyc/nin/vnin", {
-      params: { vnin },
-    });
-    return response.data.entity;
-  } catch (error: any) {
-    const message = error.response?.data?.error?.message || "NIN verification failed";
-    throw new Error(`Dojah vNIN verification failed: ${message}`);
-  }
+  const response = await dojahClient.get('/api/v1/kyc/nin/vnin', {
+    params: { vnin },
+  });
+  return response.data.entity;
+  // try {
+
+  // } catch (error: unknown) {
+  //   const message =
+  //     (error as { response: { data: { error: { message: string } } } }).response?.data?.error?.message || 'NIN verification failed';
+  //   throw new Error(`Dojah vNIN verification failed: ${message}`, { cause: error });
+  // }
 }

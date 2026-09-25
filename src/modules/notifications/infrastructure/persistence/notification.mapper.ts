@@ -1,5 +1,5 @@
-import { Notification, NotificationType } from "../../domain/notification";
-import { NotificationOrmEntity } from "./notification.orm-entity";
+import { Notification, NotificationType } from '../../domain/notification';
+import { NotificationOrmEntity } from './notification.orm-entity';
 
 export class NotificationMapper {
   static toDomain(entity: NotificationOrmEntity): Notification {
@@ -11,7 +11,7 @@ export class NotificationMapper {
       entity.message,
       entity.isRead,
       entity.metadata || {},
-      entity.createdAt,
+      entity.createdAt
     );
   }
 

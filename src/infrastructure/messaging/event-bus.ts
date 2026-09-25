@@ -1,4 +1,4 @@
-import { rabbitMQ, EXCHANGE_NAME } from "./rabbitmq";
+import { rabbitMQ, EXCHANGE_NAME } from './rabbitmq';
 
 export interface DomainEvent {
   type: string;
@@ -9,7 +9,9 @@ export interface DomainEvent {
 export function publishEvent(routingKey: string, event: DomainEvent): void {
   const channel = rabbitMQ.getChannel();
   if (!channel) {
-    console.warn(`RabbitMQ channel unavailable. Event not published: ${event.type}`);
+    console.warn(
+      `RabbitMQ channel unavailable. Event not published: ${event.type}`
+    );
     return;
   }
 
@@ -18,7 +20,7 @@ export function publishEvent(routingKey: string, event: DomainEvent): void {
       EXCHANGE_NAME,
       routingKey,
       Buffer.from(JSON.stringify(event)),
-      { persistent: true },
+      { persistent: true }
     );
   } catch (error) {
     console.error(`Failed to publish event ${event.type}:`, error);

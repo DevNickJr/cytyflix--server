@@ -1,19 +1,19 @@
 // Event type constants
-export const BOOKING_CONFIRMED = "booking.confirmed";
-export const BOOKING_CANCELLED = "booking.cancelled";
-export const BOOKING_PAYMENT_RECEIVED = "booking.payment_received";
-export const BOOKING_AGENT_CONFIRMED = "booking.agent_confirmed";
-export const BOOKING_CLIENT_RELEASED = "booking.client_released";
-export const BOOKING_SCHEDULE_UPDATED = "booking.schedule_updated";
-export const INQUIRY_RECEIVED = "inquiry.received";
-export const INQUIRY_RESPONDED = "inquiry.responded";
-export const VERIFICATION_APPROVED = "verification.approved";
-export const VERIFICATION_REJECTED = "verification.rejected";
-export const PROPERTY_FROZEN = "property.frozen";
-export const RENT_PAYMENT_RECEIVED = "rent.payment_received";
-export const RENT_MOVE_IN_CONFIRMED = "rent.move_in_confirmed";
-export const AGREEMENT_CREATED = "agreement.created";
-export const AGREEMENT_SIGNED = "agreement.signed";
+export const BOOKING_CONFIRMED = 'booking.confirmed';
+export const BOOKING_CANCELLED = 'booking.cancelled';
+export const BOOKING_PAYMENT_RECEIVED = 'booking.payment_received';
+export const BOOKING_AGENT_CONFIRMED = 'booking.agent_confirmed';
+export const BOOKING_CLIENT_RELEASED = 'booking.client_released';
+export const BOOKING_SCHEDULE_UPDATED = 'booking.schedule_updated';
+export const INQUIRY_RECEIVED = 'inquiry.received';
+export const INQUIRY_RESPONDED = 'inquiry.responded';
+export const VERIFICATION_APPROVED = 'verification.approved';
+export const VERIFICATION_REJECTED = 'verification.rejected';
+export const PROPERTY_FROZEN = 'property.frozen';
+export const RENT_PAYMENT_RECEIVED = 'rent.payment_received';
+export const RENT_MOVE_IN_CONFIRMED = 'rent.move_in_confirmed';
+export const AGREEMENT_CREATED = 'agreement.created';
+export const AGREEMENT_SIGNED = 'agreement.signed';
 
 // Payload interfaces
 export interface BookingConfirmedPayload {

@@ -1,5 +1,5 @@
-import { RentPayment, RentPaymentStatus } from "../../domain/rent-payment";
-import { RentPaymentOrmEntity } from "./rent-payment.orm-entity";
+import { RentPayment, RentPaymentStatus } from '../../domain/rent-payment';
+import { RentPaymentOrmEntity } from './rent-payment.orm-entity';
 
 export class RentPaymentMapper {
   static toDomain(entity: RentPaymentOrmEntity): RentPayment {
@@ -18,7 +18,7 @@ export class RentPaymentMapper {
       entity.releasedAt,
       entity.expiresAt,
       entity.createdAt,
-      entity.updatedAt,
+      entity.updatedAt
     );
   }
 

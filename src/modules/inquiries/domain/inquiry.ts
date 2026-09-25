@@ -1,7 +1,7 @@
 export enum InquiryStatus {
-  PENDING = "pending",
-  RESPONDED = "responded",
-  CLOSED = "closed",
+  PENDING = 'pending',
+  RESPONDED = 'responded',
+  CLOSED = 'closed',
 }
 
 export class Inquiry {
@@ -13,6 +13,6 @@ export class Inquiry {
     public message: string,
     public status: InquiryStatus = InquiryStatus.PENDING,
     public createdAt: Date = new Date(),
-    public updatedAt: Date = new Date(),
+    public updatedAt: Date = new Date()
   ) {}
 }

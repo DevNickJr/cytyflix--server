@@ -1,8 +1,11 @@
-import crypto from "crypto";
-import { Notification, NotificationType } from "@/modules/notifications/domain/notification";
-import { NotificationRepository } from "@/modules/notifications/contracts/notification.interfaces";
-import { CreateNotificationDTO } from "@/modules/notifications/contracts/notification.schemas";
-import CustomError from "@/shared/utils/custom-error";
+import crypto from 'crypto';
+import {
+  Notification,
+  NotificationType,
+} from '@/modules/notifications/domain/notification';
+import { NotificationRepository } from '@/modules/notifications/contracts/notification.interfaces';
+import { CreateNotificationDTO } from '@/modules/notifications/contracts/notification.schemas';
+import CustomError from '@/shared/utils/custom-error';
 
 export class NotificationService {
   constructor(private readonly notificationRepo: NotificationRepository) {}
@@ -15,7 +18,7 @@ export class NotificationService {
       dto.title,
       dto.message,
       false,
-      dto.metadata,
+      dto.metadata
     );
 
     return this.notificationRepo.create(notification);
@@ -27,8 +30,8 @@ export class NotificationService {
 
   async markAsRead(id: string, userId: string) {
     const notification = await this.notificationRepo.findById(id);
-    if (!notification) throw new CustomError("Notification not found", 404);
-    if (notification.userId !== userId) throw new CustomError("Forbidden", 403);
+    if (!notification) throw new CustomError('Notification not found', 404);
+    if (notification.userId !== userId) throw new CustomError('Forbidden', 403);
 
     await this.notificationRepo.markAsRead(id);
     return { success: true };

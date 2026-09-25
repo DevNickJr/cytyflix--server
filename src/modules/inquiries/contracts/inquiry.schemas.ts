@@ -1,4 +1,4 @@
-import z from "zod";
+import z from 'zod';
 
 export const CreateInquirySchema = z.object({
   propertyId: z.string().uuid(),
@@ -8,7 +8,7 @@ export const CreateInquirySchema = z.object({
 export type CreateInquiryDTO = z.infer<typeof CreateInquirySchema>;
 
 export const UpdateInquiryStatusSchema = z.object({
-  status: z.enum(["responded", "closed"]),
+  status: z.enum(['responded', 'closed']),
 });
 
 export type UpdateInquiryStatusDTO = z.infer<typeof UpdateInquiryStatusSchema>;

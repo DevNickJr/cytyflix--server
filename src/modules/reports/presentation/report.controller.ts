@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import { ReportService } from "../application/report.service";
-import { PaginationQueryDTO } from "@/shared/schemas";
+import { Request, Response, NextFunction } from 'express';
+import { ReportService } from '../application/report.service';
+import { PaginationQueryDTO } from '@/shared/schemas';
 
 export class ReportController {
   constructor(private readonly service: ReportService) {}
@@ -10,7 +10,7 @@ export class ReportController {
       const report = await this.service.create(
         req.user!.id,
         req.params.propertyId as string,
-        req.body,
+        req.body
       );
       res.status(201).json({ success: true, data: report });
     } catch (error) {
@@ -34,7 +34,7 @@ export class ReportController {
       const report = await this.service.review(
         req.params.id as string,
         req.user!.id,
-        req.body,
+        req.body
       );
       res.json({ success: true, data: report });
     } catch (error) {

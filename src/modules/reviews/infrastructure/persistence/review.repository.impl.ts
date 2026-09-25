@@ -1,14 +1,12 @@
-import { Repository } from "typeorm";
-import { ReviewRepository } from "../../contracts/review.interfaces";
-import { Review } from "../../domain/review";
-import { PaginatedResult } from "@/modules/properties/contracts/property.interfaces";
-import { ReviewOrmEntity } from "./review.orm-entity";
-import { ReviewMapper } from "./review.mapper";
+import { Repository } from 'typeorm';
+import { ReviewRepository } from '../../contracts/review.interfaces';
+import { Review } from '../../domain/review';
+import { PaginatedResult } from '@/modules/properties/contracts/property.interfaces';
+import { ReviewOrmEntity } from './review.orm-entity';
+import { ReviewMapper } from './review.mapper';
 
 export class ReviewRepositoryImpl implements ReviewRepository {
-  constructor(
-    private readonly ormRepo: Repository<ReviewOrmEntity>,
-  ) {}
+  constructor(private readonly ormRepo: Repository<ReviewOrmEntity>) {}
 
   async create(review: Review): Promise<Review> {
     const entity = ReviewMapper.toPersistence(review);
@@ -29,10 +27,14 @@ export class ReviewRepositoryImpl implements ReviewRepository {
     return ReviewMapper.toDomain(entity);
   }
 
-  async findByPropertyId(propertyId: string, page: number, limit: number): Promise<PaginatedResult<Review>> {
+  async findByPropertyId(
+    propertyId: string,
+    page: number,
+    limit: number
+  ): Promise<PaginatedResult<Review>> {
     const [entities, total] = await this.ormRepo.findAndCount({
       where: { propertyId },
-      order: { createdAt: "DESC" },
+      order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
       relations: { user: { profile: true } },
@@ -47,7 +49,10 @@ export class ReviewRepositoryImpl implements ReviewRepository {
     };
   }
 
-  async findByUserAndProperty(userId: string, propertyId: string): Promise<Review | null> {
+  async findByUserAndProperty(
+    userId: string,
+    propertyId: string
+  ): Promise<Review | null> {
     const entity = await this.ormRepo.findOne({
       where: { userId, propertyId },
       relations: { user: { profile: true } },
@@ -56,12 +61,14 @@ export class ReviewRepositoryImpl implements ReviewRepository {
     return ReviewMapper.toDomain(entity);
   }
 
-  async getAverageRating(propertyId: string): Promise<{ average: number; count: number }> {
+  async getAverageRating(
+    propertyId: string
+  ): Promise<{ average: number; count: number }> {
     const result = await this.ormRepo
-      .createQueryBuilder("review")
-      .select("AVG(review.rating)", "average")
-      .addSelect("COUNT(review.id)", "count")
-      .where("review.propertyId = :propertyId", { propertyId })
+      .createQueryBuilder('review')
+      .select('AVG(review.rating)', 'average')
+      .addSelect('COUNT(review.id)', 'count')
+      .where('review.propertyId = :propertyId', { propertyId })
       .getRawOne();
 
     return {

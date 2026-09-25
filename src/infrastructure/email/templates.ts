@@ -1,5 +1,8 @@
-import { generateGoogleCalendarLink, generateOutlookCalendarLink } from "@/shared/utils/calendar-links";
-import env from "@/configs/env.config";
+import {
+  generateGoogleCalendarLink,
+  generateOutlookCalendarLink,
+} from '@/shared/utils/calendar-links';
+import env from '@/configs/env.config';
 
 interface EmailTemplate {
   subject: string;
@@ -7,7 +10,12 @@ interface EmailTemplate {
   text: string;
 }
 
-function calendarLinksHTML(data: { bookingId: string; bookingReference: string; scheduledDate: Date; scheduledTime: string }): string {
+function calendarLinksHTML(data: {
+  bookingId: string;
+  bookingReference: string;
+  scheduledDate: Date;
+  scheduledTime: string;
+}): string {
   const calData = {
     title: `CytyFlix Booking - ${data.bookingReference}`,
     description: `Property inspection booking. Reference: ${data.bookingReference}`,
@@ -18,7 +26,7 @@ function calendarLinksHTML(data: { bookingId: string; bookingReference: string; 
 
   const googleLink = generateGoogleCalendarLink(calData);
   const outlookLink = generateOutlookCalendarLink(calData);
-  const apiUrl = env.APP_URL || "http://localhost:4001";
+  const apiUrl = env.APP_URL || 'http://localhost:4001';
   const icsLink = `${apiUrl}/api/v1/bookings/${data.bookingId}/calendar.ics`;
 
   return `
@@ -43,9 +51,16 @@ export function bookingConfirmedClientEmail(data: {
   scheduledTime: string;
   bookingReference: string;
 }): EmailTemplate {
-  const calLinks = data.bookingId ? calendarLinksHTML({ bookingId: data.bookingId, bookingReference: data.bookingReference, scheduledDate: data.scheduledDate, scheduledTime: data.scheduledTime }) : "";
+  const calLinks = data.bookingId
+    ? calendarLinksHTML({
+        bookingId: data.bookingId,
+        bookingReference: data.bookingReference,
+        scheduledDate: data.scheduledDate,
+        scheduledTime: data.scheduledTime,
+      })
+    : '';
   return {
-    subject: "Booking Confirmed - CytyFlix",
+    subject: 'Booking Confirmed - CytyFlix',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Booking Confirmed!</h2>
@@ -74,7 +89,7 @@ export function bookingConfirmedAgentEmail(data: {
   bookingReference: string;
 }): EmailTemplate {
   return {
-    subject: "New Booking Received - CytyFlix",
+    subject: 'New Booking Received - CytyFlix',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>New Booking Received!</h2>
@@ -102,7 +117,7 @@ export function bookingCancelledEmail(data: {
   scheduledTime: string;
 }): EmailTemplate {
   return {
-    subject: "Booking Cancelled - CytyFlix",
+    subject: 'Booking Cancelled - CytyFlix',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Booking Cancelled</h2>
@@ -124,9 +139,16 @@ export function bookingPaymentReceivedClientEmail(data: {
   scheduledTime: string;
   bookingReference: string;
 }): EmailTemplate {
-  const calLinks = data.bookingId ? calendarLinksHTML({ bookingId: data.bookingId, bookingReference: data.bookingReference, scheduledDate: data.scheduledDate, scheduledTime: data.scheduledTime }) : "";
+  const calLinks = data.bookingId
+    ? calendarLinksHTML({
+        bookingId: data.bookingId,
+        bookingReference: data.bookingReference,
+        scheduledDate: data.scheduledDate,
+        scheduledTime: data.scheduledTime,
+      })
+    : '';
   return {
-    subject: "Payment Received - Awaiting Agent Confirmation - CytyFlix",
+    subject: 'Payment Received - Awaiting Agent Confirmation - CytyFlix',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Payment Received!</h2>
@@ -156,7 +178,7 @@ export function bookingPaymentReceivedAgentEmail(data: {
   bookingReference: string;
 }): EmailTemplate {
   return {
-    subject: "New Booking - Action Required - CytyFlix",
+    subject: 'New Booking - Action Required - CytyFlix',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>New Booking — Action Required</h2>
@@ -184,9 +206,16 @@ export function bookingAgentConfirmedEmail(data: {
   scheduledTime: string;
   bookingReference: string;
 }): EmailTemplate {
-  const calLinks = data.bookingId ? calendarLinksHTML({ bookingId: data.bookingId, bookingReference: data.bookingReference, scheduledDate: data.scheduledDate, scheduledTime: data.scheduledTime }) : "";
+  const calLinks = data.bookingId
+    ? calendarLinksHTML({
+        bookingId: data.bookingId,
+        bookingReference: data.bookingReference,
+        scheduledDate: data.scheduledDate,
+        scheduledTime: data.scheduledTime,
+      })
+    : '';
   return {
-    subject: "Booking Confirmed by Agent - CytyFlix",
+    subject: 'Booking Confirmed by Agent - CytyFlix',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Booking Confirmed!</h2>
@@ -214,7 +243,7 @@ export function bookingScheduleUpdatedEmail(data: {
   bookingReference: string;
 }): EmailTemplate {
   return {
-    subject: "Booking Schedule Updated - CytyFlix",
+    subject: 'Booking Schedule Updated - CytyFlix',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Booking Schedule Updated</h2>
@@ -240,7 +269,7 @@ export function bookingClientReleasedEmail(data: {
   bookingReference: string;
 }): EmailTemplate {
   return {
-    subject: "Payment Released - CytyFlix",
+    subject: 'Payment Released - CytyFlix',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Payment Released!</h2>
@@ -306,7 +335,7 @@ export function verificationApprovedEmail(data: {
   agentName: string;
 }): EmailTemplate {
   return {
-    subject: "Agent Verification Approved - CytyFlix",
+    subject: 'Agent Verification Approved - CytyFlix',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Verification Approved!</h2>
@@ -328,7 +357,7 @@ export function propertyFrozenEmail(data: {
   reason: string;
 }): EmailTemplate {
   return {
-    subject: "Property Listing Frozen - CytyFlix",
+    subject: 'Property Listing Frozen - CytyFlix',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #dc2626;">Property Listing Frozen</h2>
@@ -356,7 +385,7 @@ export function rentPaymentReceivedEmail(data: {
   paymentReference: string;
 }): EmailTemplate {
   return {
-    subject: "Rent Payment Received - CytyFlix",
+    subject: 'Rent Payment Received - CytyFlix',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Rent Payment Received</h2>
@@ -382,7 +411,7 @@ export function rentMoveInConfirmedEmail(data: {
   paymentReference: string;
 }): EmailTemplate {
   return {
-    subject: "Move-In Confirmed — Payment Released - CytyFlix",
+    subject: 'Move-In Confirmed — Payment Released - CytyFlix',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Move-In Confirmed!</h2>
@@ -403,7 +432,7 @@ export function rentReleasedEmail(data: {
   paymentReference: string;
 }): EmailTemplate {
   return {
-    subject: "Rent Payment Auto-Released - CytyFlix",
+    subject: 'Rent Payment Auto-Released - CytyFlix',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Rent Payment Released</h2>
@@ -422,7 +451,7 @@ export function verificationRejectedEmail(data: {
   reason: string;
 }): EmailTemplate {
   return {
-    subject: "Agent Verification Rejected - CytyFlix",
+    subject: 'Agent Verification Rejected - CytyFlix',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Verification Rejected</h2>
@@ -445,7 +474,7 @@ export function agreementCreatedEmail(data: {
   propertyTitle: string;
 }): EmailTemplate {
   return {
-    subject: "New Tenancy Agreement to Review - CytyFlix",
+    subject: 'New Tenancy Agreement to Review - CytyFlix',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Tenancy Agreement Created</h2>
@@ -464,7 +493,7 @@ export function agreementSignedEmail(data: {
   tenantName: string;
 }): EmailTemplate {
   return {
-    subject: "Tenancy Agreement Fully Signed - CytyFlix",
+    subject: 'Tenancy Agreement Fully Signed - CytyFlix',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Agreement Signed by Both Parties</h2>

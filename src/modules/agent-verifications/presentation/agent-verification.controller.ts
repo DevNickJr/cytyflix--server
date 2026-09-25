@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import { AgentVerificationService } from "../application/agent-verification.service";
-import { PaginationQueryDTO } from "@/shared/schemas";
+import { Request, Response, NextFunction } from 'express';
+import { AgentVerificationService } from '../application/agent-verification.service';
+import { PaginationQueryDTO } from '@/shared/schemas';
 
 export class AgentVerificationController {
   constructor(private readonly service: AgentVerificationService) {}
@@ -14,7 +14,11 @@ export class AgentVerificationController {
     }
   };
 
-  getMyVerification = async (req: Request, res: Response, next: NextFunction) => {
+  getMyVerification = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const verification = await this.service.getMyVerification(req.user!.id);
       res.json({ success: true, data: verification });
@@ -48,7 +52,7 @@ export class AgentVerificationController {
       const verification = await this.service.review(
         req.params.id as string,
         req.user!.id,
-        req.body,
+        req.body
       );
       res.json({ success: true, data: verification });
     } catch (error) {

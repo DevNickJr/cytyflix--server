@@ -1,5 +1,8 @@
-import { TenancyAgreement, AgreementStatus } from "../../domain/tenancy-agreement";
-import { TenancyAgreementOrmEntity } from "./tenancy-agreement.orm-entity";
+import {
+  TenancyAgreement,
+  AgreementStatus,
+} from '../../domain/tenancy-agreement';
+import { TenancyAgreementOrmEntity } from './tenancy-agreement.orm-entity';
 
 export class TenancyAgreementMapper {
   static toDomain(entity: TenancyAgreementOrmEntity): TenancyAgreement {
@@ -15,11 +18,13 @@ export class TenancyAgreementMapper {
       entity.tenantSignedAt,
       entity.status as AgreementStatus,
       entity.createdAt,
-      entity.updatedAt,
+      entity.updatedAt
     );
   }
 
-  static toPersistence(domain: TenancyAgreement): Partial<TenancyAgreementOrmEntity> {
+  static toPersistence(
+    domain: TenancyAgreement
+  ): Partial<TenancyAgreementOrmEntity> {
     return {
       id: domain.id,
       propertyId: domain.propertyId,

@@ -1,11 +1,20 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Unique } from "typeorm";
-import { UserOrmEntity } from "@/modules/users/infrastructure/persistence/user.orm-entity";
-import { PropertyOrmEntity } from "@/modules/properties/infrastructure/persistence/property.orm-entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Unique,
+} from 'typeorm';
+import { UserOrmEntity } from '@/modules/users/infrastructure/persistence/user.orm-entity';
+import { PropertyOrmEntity } from '@/modules/properties/infrastructure/persistence/property.orm-entity';
 
-@Entity("reviews")
-@Unique(["userId", "propertyId"])
+@Entity('reviews')
+@Unique(['userId', 'propertyId'])
 export class ReviewOrmEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column()
@@ -14,18 +23,18 @@ export class ReviewOrmEntity {
   @Column()
   propertyId!: string;
 
-  @Column({ type: "int" })
+  @Column({ type: 'int' })
   rating!: number;
 
-  @Column({ type: "text" })
+  @Column({ type: 'text' })
   comment!: string;
 
   @ManyToOne(() => UserOrmEntity)
-  @JoinColumn({ name: "userId" })
+  @JoinColumn({ name: 'userId' })
   user!: UserOrmEntity;
 
-  @ManyToOne(() => PropertyOrmEntity, { onDelete: "CASCADE" })
-  @JoinColumn({ name: "propertyId" })
+  @ManyToOne(() => PropertyOrmEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'propertyId' })
   property!: PropertyOrmEntity;
 
   @CreateDateColumn()

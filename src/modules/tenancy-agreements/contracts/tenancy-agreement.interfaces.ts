@@ -1,4 +1,4 @@
-import { TenancyAgreement } from "../domain/tenancy-agreement";
+import { TenancyAgreement } from '../domain/tenancy-agreement';
 
 export interface PaginatedResult<T> {
   data: T[];
@@ -10,6 +10,10 @@ export interface PaginatedResult<T> {
 export interface TenancyAgreementRepository {
   create(agreement: TenancyAgreement): Promise<TenancyAgreement>;
   findById(id: string): Promise<TenancyAgreement | null>;
-  findByUserId(userId: string, page: number, limit: number): Promise<PaginatedResult<TenancyAgreement>>;
+  findByUserId(
+    userId: string,
+    page: number,
+    limit: number
+  ): Promise<PaginatedResult<TenancyAgreement>>;
   update(agreement: TenancyAgreement): Promise<TenancyAgreement>;
 }

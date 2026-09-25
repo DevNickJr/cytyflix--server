@@ -1,5 +1,5 @@
-import { AnalyticsEvent, EventType } from "../domain/analytics-event";
-import { AnalyticsEventRepository } from "../contracts/analytics-event.interfaces";
+import { AnalyticsEvent, EventType } from '../domain/analytics-event';
+import { AnalyticsEventRepository } from '../contracts/analytics-event.interfaces';
 
 export class AnalyticsEventService {
   constructor(private readonly analyticsRepo: AnalyticsEventRepository) {}
@@ -8,14 +8,14 @@ export class AnalyticsEventService {
     eventType: EventType,
     targetId: string,
     userId?: string,
-    metadata?: Record<string, unknown>,
+    metadata?: Record<string, unknown>
   ) {
     const event = new AnalyticsEvent(
       crypto.randomUUID(),
       eventType,
       targetId,
       userId,
-      metadata,
+      metadata
     );
     return this.analyticsRepo.create(event);
   }
@@ -23,7 +23,7 @@ export class AnalyticsEventService {
   async getPropertyViews(propertyId: string) {
     const views = await this.analyticsRepo.countByTarget(
       EventType.PROPERTY_VIEW,
-      propertyId,
+      propertyId
     );
     return { views };
   }

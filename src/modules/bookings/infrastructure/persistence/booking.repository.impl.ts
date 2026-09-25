@@ -1,14 +1,12 @@
-import { Repository, LessThan } from "typeorm";
-import { BookingRepository } from "../../contracts/booking.interfaces";
-import { Booking, BookingStatus, PaymentStatus } from "../../domain/booking";
-import { PaginatedResult } from "@/modules/properties/contracts/property.interfaces";
-import { BookingOrmEntity } from "./booking.orm-entity";
-import { BookingMapper } from "./booking.mapper";
+import { Repository, LessThan } from 'typeorm';
+import { BookingRepository } from '../../contracts/booking.interfaces';
+import { Booking, BookingStatus, PaymentStatus } from '../../domain/booking';
+import { PaginatedResult } from '@/modules/properties/contracts/property.interfaces';
+import { BookingOrmEntity } from './booking.orm-entity';
+import { BookingMapper } from './booking.mapper';
 
 export class BookingRepositoryImpl implements BookingRepository {
-  constructor(
-    private readonly ormRepo: Repository<BookingOrmEntity>,
-  ) {}
+  constructor(private readonly ormRepo: Repository<BookingOrmEntity>) {}
 
   async create(booking: Booking): Promise<Booking> {
     const entity = BookingMapper.toPersistence(booking);
@@ -19,16 +17,24 @@ export class BookingRepositoryImpl implements BookingRepository {
   async findById(id: string): Promise<Booking | null> {
     const entity = await this.ormRepo.findOne({
       where: { id },
-      relations: { client: { profile: true }, agent: { profile: true }, property: true },
+      relations: {
+        client: { profile: true },
+        agent: { profile: true },
+        property: true,
+      },
     });
     if (!entity) return null;
     return BookingMapper.toDomain(entity);
   }
 
-  async findByClientId(clientId: string, page: number, limit: number): Promise<PaginatedResult<Booking>> {
+  async findByClientId(
+    clientId: string,
+    page: number,
+    limit: number
+  ): Promise<PaginatedResult<Booking>> {
     const [entities, total] = await this.ormRepo.findAndCount({
       where: { clientId },
-      order: { createdAt: "DESC" },
+      order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
       relations: { agent: { profile: true }, property: true },
@@ -43,10 +49,14 @@ export class BookingRepositoryImpl implements BookingRepository {
     };
   }
 
-  async findByAgentId(agentId: string, page: number, limit: number): Promise<PaginatedResult<Booking>> {
+  async findByAgentId(
+    agentId: string,
+    page: number,
+    limit: number
+  ): Promise<PaginatedResult<Booking>> {
     const [entities, total] = await this.ormRepo.findAndCount({
       where: { agentId },
-      order: { createdAt: "DESC" },
+      order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
       relations: { client: { profile: true }, property: true },
@@ -62,7 +72,9 @@ export class BookingRepositoryImpl implements BookingRepository {
   }
 
   async findByPaymentReference(reference: string): Promise<Booking | null> {
-    const entity = await this.ormRepo.findOne({ where: { paymentReference: reference } });
+    const entity = await this.ormRepo.findOne({
+      where: { paymentReference: reference },
+    });
     if (!entity) return null;
     return BookingMapper.toDomain(entity);
   }

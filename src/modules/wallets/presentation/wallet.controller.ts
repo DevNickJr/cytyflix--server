@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import { WalletService } from "../application/wallet.service";
+import { Request, Response, NextFunction } from 'express';
+import { WalletService } from '../application/wallet.service';
 
 export class WalletController {
   constructor(private readonly service: WalletService) {}
@@ -15,14 +15,15 @@ export class WalletController {
 
   withdraw = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { amount, beneficiaryId, bankCode, accountNumber, accountName } = req.body;
+      const { amount, beneficiaryId, bankCode, accountNumber, accountName } =
+        req.body;
       const transaction = await this.service.requestWithdrawal(
         req.user!.id,
         amount,
         beneficiaryId,
         bankCode,
         accountNumber,
-        accountName,
+        accountName
       );
       res.json({ success: true, data: transaction });
     } catch (error) {
@@ -38,7 +39,7 @@ export class WalletController {
         bankCode,
         bankName,
         accountNumber,
-        accountName,
+        accountName
       );
       res.status(201).json({ success: true, data: beneficiary });
     } catch (error) {
@@ -46,7 +47,11 @@ export class WalletController {
     }
   };
 
-  getBeneficiaries = async (req: Request, res: Response, next: NextFunction) => {
+  getBeneficiaries = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const beneficiaries = await this.service.getBeneficiaries(req.user!.id);
       res.json({ success: true, data: beneficiaries });
@@ -55,10 +60,17 @@ export class WalletController {
     }
   };
 
-  deleteBeneficiary = async (req: Request, res: Response, next: NextFunction) => {
+  deleteBeneficiary = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await this.service.deleteBeneficiary(req.user!.id, req.params.id as string);
-      res.json({ success: true, message: "Beneficiary deleted" });
+      await this.service.deleteBeneficiary(
+        req.user!.id,
+        req.params.id as string
+      );
+      res.json({ success: true, message: 'Beneficiary deleted' });
     } catch (error) {
       next(error);
     }
@@ -88,7 +100,11 @@ export class WalletController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
-      const result = await this.service.getTransactionHistory(req.user!.id, page, limit);
+      const result = await this.service.getTransactionHistory(
+        req.user!.id,
+        page,
+        limit
+      );
       res.json({ success: true, ...result });
     } catch (error) {
       next(error);

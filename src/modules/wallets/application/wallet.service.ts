@@ -1,23 +1,29 @@
-import crypto from "crypto";
-import { Wallet, WalletTransaction, Beneficiary, TransactionType, TransactionStatus } from "../domain/wallet";
-import { WalletRepository } from "../contracts/wallet.interfaces";
-import { createTransferRecipient, initiateTransfer, listBanks, resolveAccountNumber, PaystackBank } from "@/infrastructure/payments/paystack";
-import CustomError from "@/shared/utils/custom-error";
+import crypto from 'crypto';
+import {
+  Wallet,
+  WalletTransaction,
+  Beneficiary,
+  TransactionType,
+  TransactionStatus,
+} from '../domain/wallet';
+import { WalletRepository } from '../contracts/wallet.interfaces';
+import {
+  createTransferRecipient,
+  initiateTransfer,
+  listBanks,
+  resolveAccountNumber,
+  PaystackBank,
+} from '@/infrastructure/payments/paystack';
+import CustomError from '@/shared/utils/custom-error';
 
 export class WalletService {
-  constructor(
-    private readonly walletRepo: WalletRepository,
-  ) {}
+  constructor(private readonly walletRepo: WalletRepository) {}
 
   async getOrCreateWallet(userId: string): Promise<Wallet> {
     const existing = await this.walletRepo.findByUserId(userId);
     if (existing) return existing;
 
-    const wallet = new Wallet(
-      crypto.randomUUID(),
-      userId,
-      0,
-    );
+    const wallet = new Wallet(crypto.randomUUID(), userId, 0);
     return this.walletRepo.create(wallet);
   }
 
@@ -30,12 +36,13 @@ export class WalletService {
     amount: number,
     reference: string,
     description: string,
-    metadata: Record<string, any> = {},
+    metadata: Record<string, any> = {}
   ): Promise<WalletTransaction> {
     const wallet = await this.getOrCreateWallet(userId);
 
     // Idempotency: check for duplicate reference
-    const existing = await this.walletRepo.findTransactionByReference(reference);
+    const existing =
+      await this.walletRepo.findTransactionByReference(reference);
     if (existing) return existing;
 
     const balanceAfter = wallet.balance + amount;
@@ -49,7 +56,7 @@ export class WalletService {
       TransactionStatus.COMPLETED,
       reference,
       description,
-      metadata,
+      metadata
     );
 
     // TODO: i need to wrap the following two operations in a transaction to ensure atomicity
@@ -65,16 +72,17 @@ export class WalletService {
     beneficiaryId?: string,
     bankCode?: string,
     accountNumber?: string,
-    accountName?: string,
+    accountName?: string
   ): Promise<WalletTransaction> {
     const wallet = await this.getOrCreateWallet(userId);
 
     if (wallet.balance < amount) {
-      throw new CustomError("Insufficient wallet balance", 400);
+      throw new CustomError('Insufficient wallet balance', 400);
     }
 
-    if (wallet.balance < 1000 * 100) { // Assuming the balance is in kobo (or cents), so 1000 Naira = 100000 kobo
-      throw new CustomError("Minimum withdrawal amount is 1000", 400);
+    if (wallet.balance < 1000 * 100) {
+      // Assuming the balance is in kobo (or cents), so 1000 Naira = 100000 kobo
+      throw new CustomError('Minimum withdrawal amount is 1000', 400);
     }
 
     let recipientCode: string;
@@ -83,9 +91,10 @@ export class WalletService {
     let resolvedAccountName: string;
 
     if (beneficiaryId) {
-      const beneficiary = await this.walletRepo.findBeneficiaryById(beneficiaryId);
+      const beneficiary =
+        await this.walletRepo.findBeneficiaryById(beneficiaryId);
       if (!beneficiary || beneficiary.userId !== userId) {
-        throw new CustomError("Beneficiary not found", 404);
+        throw new CustomError('Beneficiary not found', 404);
       }
       recipientCode = beneficiary.recipientCode;
       resolvedBankCode = beneficiary.bankCode;
@@ -93,12 +102,19 @@ export class WalletService {
       resolvedAccountName = beneficiary.accountName;
     } else {
       if (!bankCode || !accountNumber || !accountName) {
-        throw new CustomError("Bank details are required when no beneficiary is selected", 400);
+        throw new CustomError(
+          'Bank details are required when no beneficiary is selected',
+          400
+        );
       }
       resolvedBankCode = bankCode;
       resolvedAccountNumber = accountNumber;
       resolvedAccountName = accountName;
-      recipientCode = await createTransferRecipient(accountName, accountNumber, bankCode);
+      recipientCode = await createTransferRecipient(
+        accountName,
+        accountNumber,
+        bankCode
+      );
     }
 
     const reference = `WDR-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
@@ -112,8 +128,12 @@ export class WalletService {
       balanceAfter,
       TransactionStatus.PENDING,
       reference,
-      "Wallet withdrawal",
-      { bankCode: resolvedBankCode, accountNumber: resolvedAccountNumber, accountName: resolvedAccountName },
+      'Wallet withdrawal',
+      {
+        bankCode: resolvedBankCode,
+        accountNumber: resolvedAccountNumber,
+        accountName: resolvedAccountName,
+      }
     );
 
     // TODO: i need to wrap the following two operations in a transaction to ensure atomicity
@@ -127,14 +147,17 @@ export class WalletService {
         transaction.status = TransactionStatus.COMPLETED;
         await this.walletRepo.createTransaction(transaction);
       } catch (error) {
-        console.error("Failed to update transaction status to COMPLETED:", error);
+        console.error(
+          'Failed to update transaction status to COMPLETED:',
+          error
+        );
       }
     } catch (error) {
       // Revert balance on failure
       await this.walletRepo.updateBalance(wallet.id, wallet.balance);
       transaction.status = TransactionStatus.FAILED;
       await this.walletRepo.createTransaction(transaction);
-      throw new CustomError("Withdrawal failed. Please try again later.", 500);
+      throw new CustomError('Withdrawal failed. Please try again later.', 500);
     }
 
     return transaction;
@@ -145,14 +168,22 @@ export class WalletService {
     bankCode: string,
     bankName: string,
     accountNumber: string,
-    accountName: string,
+    accountName: string
   ): Promise<Beneficiary> {
-    const existing = await this.walletRepo.findBeneficiaryByAccount(userId, bankCode, accountNumber);
+    const existing = await this.walletRepo.findBeneficiaryByAccount(
+      userId,
+      bankCode,
+      accountNumber
+    );
     if (existing) {
       return existing;
     }
 
-    const recipientCode = await createTransferRecipient(accountName, accountNumber, bankCode);
+    const recipientCode = await createTransferRecipient(
+      accountName,
+      accountNumber,
+      bankCode
+    );
 
     const beneficiary = new Beneficiary(
       crypto.randomUUID(),
@@ -161,7 +192,7 @@ export class WalletService {
       bankName,
       accountNumber,
       accountName,
-      recipientCode,
+      recipientCode
     );
 
     return this.walletRepo.createBeneficiary(beneficiary);
@@ -171,10 +202,14 @@ export class WalletService {
     return this.walletRepo.findBeneficiariesByUserId(userId);
   }
 
-  async deleteBeneficiary(userId: string, beneficiaryId: string): Promise<void> {
-    const beneficiary = await this.walletRepo.findBeneficiaryById(beneficiaryId);
+  async deleteBeneficiary(
+    userId: string,
+    beneficiaryId: string
+  ): Promise<void> {
+    const beneficiary =
+      await this.walletRepo.findBeneficiaryById(beneficiaryId);
     if (!beneficiary || beneficiary.userId !== userId) {
-      throw new CustomError("Beneficiary not found", 404);
+      throw new CustomError('Beneficiary not found', 404);
     }
     await this.walletRepo.deleteBeneficiary(beneficiaryId);
   }
@@ -182,9 +217,15 @@ export class WalletService {
   async resolveAccount(accountNumber: string, bankCode: string) {
     try {
       const resolved = await resolveAccountNumber(accountNumber, bankCode);
-      return { accountName: resolved.account_name, accountNumber: resolved.account_number };
+      return {
+        accountName: resolved.account_name,
+        accountNumber: resolved.account_number,
+      };
     } catch {
-      throw new CustomError("Could not resolve account. Please verify the account number and bank.", 400);
+      throw new CustomError(
+        'Could not resolve account. Please verify the account number and bank.',
+        400
+      );
     }
   }
 

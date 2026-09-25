@@ -1,5 +1,5 @@
-import { Report, ReportReason, ReportStatus } from "../../domain/report";
-import { ReportOrmEntity } from "./report.orm-entity";
+import { Report, ReportReason, ReportStatus } from '../../domain/report';
+import { ReportOrmEntity } from './report.orm-entity';
 
 export class ReportMapper {
   static toDomain(entity: ReportOrmEntity): Report {
@@ -13,7 +13,7 @@ export class ReportMapper {
       entity.reviewedBy,
       entity.reviewedAt,
       entity.createdAt,
-      entity.updatedAt,
+      entity.updatedAt
     );
   }
 

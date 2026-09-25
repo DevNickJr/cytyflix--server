@@ -1,10 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { UserOrmEntity } from "@/modules/users/infrastructure/persistence/user.orm-entity";
-import { PropertyOrmEntity } from "@/modules/properties/infrastructure/persistence/property.orm-entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { UserOrmEntity } from '@/modules/users/infrastructure/persistence/user.orm-entity';
+import { PropertyOrmEntity } from '@/modules/properties/infrastructure/persistence/property.orm-entity';
 
-@Entity("reports")
+@Entity('reports')
 export class ReportOrmEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column()
@@ -16,28 +24,28 @@ export class ReportOrmEntity {
   @Column()
   reason!: string;
 
-  @Column({ type: "text" })
+  @Column({ type: 'text' })
   description!: string;
 
-  @Column({ default: "pending" })
+  @Column({ default: 'pending' })
   status!: string;
 
   @Column({ nullable: true })
   reviewedBy?: string;
 
-  @Column({ type: "timestamp", nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   reviewedAt?: Date;
 
   @ManyToOne(() => UserOrmEntity)
-  @JoinColumn({ name: "userId" })
+  @JoinColumn({ name: 'userId' })
   user!: UserOrmEntity;
 
-  @ManyToOne(() => PropertyOrmEntity, { onDelete: "CASCADE" })
-  @JoinColumn({ name: "propertyId" })
+  @ManyToOne(() => PropertyOrmEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'propertyId' })
   property!: PropertyOrmEntity;
 
   @ManyToOne(() => UserOrmEntity, { nullable: true })
-  @JoinColumn({ name: "reviewedBy" })
+  @JoinColumn({ name: 'reviewedBy' })
   reviewer?: UserOrmEntity;
 
   @CreateDateColumn()

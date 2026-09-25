@@ -1,5 +1,5 @@
-import { Property } from "@/modules/properties/domain/property";
-import { SearchByLocationQuery } from "@/modules/users/contracts/user.interfaces";
+import { Property } from '@/modules/properties/domain/property';
+import { SearchByLocationQuery } from '@/modules/users/contracts/user.interfaces';
 
 export interface PaginatedResult<T> {
   data: T[];
@@ -23,14 +23,17 @@ export interface SearchFilters {
   isAvailable?: boolean;
   page?: number;
   limit?: number;
-  sortBy?: "createdAt" | "price";
-  sortOrder?: "ASC" | "DESC";
+  sortBy?: 'createdAt' | 'price';
+  sortOrder?: 'ASC' | 'DESC';
 }
 
 export interface PropertyRepository {
   create(property: Property): Promise<Property>;
   findById(id: string): Promise<Property | null>;
-  findByOwnerId(ownerId: string, query: SearchByLocationQuery): Promise<PaginatedResult<Property>>;
+  findByOwnerId(
+    ownerId: string,
+    query: SearchByLocationQuery
+  ): Promise<PaginatedResult<Property>>;
   update(property: Property): Promise<Property>;
   delete(id: string): Promise<void>;
   search(filters: SearchFilters): Promise<PaginatedResult<Property>>;

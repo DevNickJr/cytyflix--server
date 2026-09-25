@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from "express";
-import { UserService } from "../application/user.service";
-import CustomError from "@/shared/utils/custom-error";
-import { SearchByLocationQuery } from "../contracts/user.interfaces";
+import { Request, Response, NextFunction } from 'express';
+import { UserService } from '../application/user.service';
+import CustomError from '@/shared/utils/custom-error';
+import { SearchByLocationQuery } from '../contracts/user.interfaces';
 
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -18,7 +18,7 @@ export class UserController {
   get = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = await this.userService.getUser(req.params.id as string);
-      if (!user) throw new CustomError("User not found", 404);
+      if (!user) throw new CustomError('User not found', 404);
       res.json({ success: true, data: user });
     } catch (error) {
       next(error);
@@ -27,8 +27,10 @@ export class UserController {
 
   getByEmail = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = await this.userService.getUserByEmail(req.params.email as string);
-      if (!user) throw new CustomError("User not found", 404);
+      const user = await this.userService.getUserByEmail(
+        req.params.email as string
+      );
+      if (!user) throw new CustomError('User not found', 404);
       res.json({ success: true, data: user });
     } catch (error) {
       next(error);
@@ -59,9 +61,9 @@ export class UserController {
   getAgents = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const query = req.query as unknown as SearchByLocationQuery;
-          console.log({
-      queryaa: query
-    })
+      console.log({
+        queryaa: query,
+      });
       const result = await this.userService.getAgents(query);
       res.json({ success: true, ...result });
     } catch (error) {
@@ -71,28 +73,35 @@ export class UserController {
 
   getAgent = async (req: Request, res: Response, next: NextFunction) => {
     console.log({
-      newagent1: req.params.id
-    })
-    console.log('Get Aggent  trace', { params: req.params })
+      newagent1: req.params.id,
+    });
+    console.log('Get Aggent  trace', { params: req.params });
 
     try {
       const agent = await this.userService.getAgent(req.params.id as string);
       console.log({
-        agent: agent
-      })
-      if (!agent) throw new CustomError("Agent not found", 404);
+        agent: agent,
+      });
+      if (!agent) throw new CustomError('Agent not found', 404);
       res.json({ success: true, data: agent });
     } catch (error) {
       next(error);
     }
   };
 
-  getAgentProperties = async (req: Request, res: Response, next: NextFunction) => {
+  getAgentProperties = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const query = req.query as unknown as SearchByLocationQuery;
-      console.log('Aggent  trace', { params: req.params })
+      console.log('Aggent  trace', { params: req.params });
 
-      const result = await this.userService.getAgentProperties(req.params.id as string, query);
+      const result = await this.userService.getAgentProperties(
+        req.params.id as string,
+        query
+      );
       res.json({ success: true, ...result });
     } catch (error) {
       next(error);
@@ -101,8 +110,10 @@ export class UserController {
 
   getAgentBySlug = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const agent = await this.userService.getAgentBySlug(req.params.slug as string);
-      if (!agent) throw new CustomError("Agent not found", 404);
+      const agent = await this.userService.getAgentBySlug(
+        req.params.slug as string
+      );
+      if (!agent) throw new CustomError('Agent not found', 404);
       res.json({ success: true, data: agent });
     } catch (error) {
       next(error);
@@ -112,7 +123,7 @@ export class UserController {
   updateSlug = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user?.id;
-      if (!userId) throw new CustomError("User is not authorized", 403);
+      if (!userId) throw new CustomError('User is not authorized', 403);
 
       const user = await this.userService.updateSlug(userId, req.body.slug);
       res.json({ success: true, data: user });
@@ -121,7 +132,11 @@ export class UserController {
     }
   };
 
-  makeAdminOrAgent = async (req: Request, res: Response, next: NextFunction) => {
+  makeAdminOrAgent = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const userId = req.user?.id;
       if (!userId) throw new CustomError('User is not authorized', 403);

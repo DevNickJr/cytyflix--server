@@ -1,14 +1,12 @@
-import { Repository } from "typeorm";
-import { InquiryRepository } from "@/modules/inquiries/contracts/inquiry.interfaces";
-import { Inquiry } from "@/modules/inquiries/domain/inquiry";
-import { PaginatedResult } from "@/modules/properties/contracts/property.interfaces";
-import { InquiryOrmEntity } from "./inquiry.orm-entity";
-import { InquiryMapper } from "./inquiry.mapper";
+import { Repository } from 'typeorm';
+import { InquiryRepository } from '@/modules/inquiries/contracts/inquiry.interfaces';
+import { Inquiry } from '@/modules/inquiries/domain/inquiry';
+import { PaginatedResult } from '@/modules/properties/contracts/property.interfaces';
+import { InquiryOrmEntity } from './inquiry.orm-entity';
+import { InquiryMapper } from './inquiry.mapper';
 
 export class InquiryRepositoryImpl implements InquiryRepository {
-  constructor(
-    private readonly ormRepo: Repository<InquiryOrmEntity>
-  ) {}
+  constructor(private readonly ormRepo: Repository<InquiryOrmEntity>) {}
 
   async create(inquiry: Inquiry): Promise<Inquiry> {
     const entity = InquiryMapper.toPersistence(inquiry);
@@ -22,10 +20,14 @@ export class InquiryRepositoryImpl implements InquiryRepository {
     return InquiryMapper.toDomain(entity);
   }
 
-  async findBySenderId(senderId: string, page: number, limit: number): Promise<PaginatedResult<Inquiry>> {
+  async findBySenderId(
+    senderId: string,
+    page: number,
+    limit: number
+  ): Promise<PaginatedResult<Inquiry>> {
     const [entities, total] = await this.ormRepo.findAndCount({
       where: { senderId },
-      order: { createdAt: "DESC" },
+      order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
     });
@@ -39,10 +41,14 @@ export class InquiryRepositoryImpl implements InquiryRepository {
     };
   }
 
-  async findByRecipientId(recipientId: string, page: number, limit: number): Promise<PaginatedResult<Inquiry>> {
+  async findByRecipientId(
+    recipientId: string,
+    page: number,
+    limit: number
+  ): Promise<PaginatedResult<Inquiry>> {
     const [entities, total] = await this.ormRepo.findAndCount({
       where: { recipientId },
-      order: { createdAt: "DESC" },
+      order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
     });
@@ -56,10 +62,14 @@ export class InquiryRepositoryImpl implements InquiryRepository {
     };
   }
 
-  async findByPropertyId(propertyId: string, page: number, limit: number): Promise<PaginatedResult<Inquiry>> {
+  async findByPropertyId(
+    propertyId: string,
+    page: number,
+    limit: number
+  ): Promise<PaginatedResult<Inquiry>> {
     const [entities, total] = await this.ormRepo.findAndCount({
       where: { propertyId },
-      order: { createdAt: "DESC" },
+      order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
     });

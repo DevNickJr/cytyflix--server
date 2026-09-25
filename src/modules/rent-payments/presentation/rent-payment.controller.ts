@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import { RentPaymentService } from "../application/rent-payment.service";
+import { Request, Response, NextFunction } from 'express';
+import { RentPaymentService } from '../application/rent-payment.service';
 
 export class RentPaymentController {
   constructor(private readonly service: RentPaymentService) {}
@@ -15,9 +15,9 @@ export class RentPaymentController {
 
   webhook = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const signature = req.headers["x-paystack-signature"] as string;
-      const rawBody = (req as any).rawBody;
-      if (!rawBody) throw new Error("Raw body required");
+      const signature = req.headers['x-paystack-signature'] as string;
+      const rawBody = req.rawBody;
+      if (!rawBody) throw new Error('Raw body required');
       await this.service.handleWebhook(rawBody, signature);
       res.sendStatus(200);
     } catch (error) {
@@ -29,8 +29,13 @@ export class RentPaymentController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
-      const role = (req.query.role as string) || "tenant";
-      const result = await this.service.getMyPayments(req.user!.id, role as "tenant" | "owner", page, limit);
+      const role = (req.query.role as string) || 'tenant';
+      const result = await this.service.getMyPayments(
+        req.user!.id,
+        role as 'tenant' | 'owner',
+        page,
+        limit
+      );
       res.json({ success: true, ...result });
     } catch (error) {
       next(error);
@@ -39,7 +44,10 @@ export class RentPaymentController {
 
   getOne = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const payment = await this.service.getPayment(req.params.id as string, req.user!.id);
+      const payment = await this.service.getPayment(
+        req.params.id as string,
+        req.user!.id
+      );
       res.json({ success: true, data: payment });
     } catch (error) {
       next(error);
@@ -48,7 +56,10 @@ export class RentPaymentController {
 
   confirmMoveIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const payment = await this.service.confirmMoveIn(req.params.id as string, req.user!.id);
+      const payment = await this.service.confirmMoveIn(
+        req.params.id as string,
+        req.user!.id
+      );
       res.json({ success: true, data: payment });
     } catch (error) {
       next(error);
@@ -57,7 +68,10 @@ export class RentPaymentController {
 
   dispute = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const payment = await this.service.dispute(req.params.id as string, req.user!.id);
+      const payment = await this.service.dispute(
+        req.params.id as string,
+        req.user!.id
+      );
       res.json({ success: true, data: payment });
     } catch (error) {
       next(error);

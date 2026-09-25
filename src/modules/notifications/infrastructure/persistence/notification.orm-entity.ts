@@ -1,9 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { UserOrmEntity } from "@/modules/users/infrastructure/persistence/user.orm-entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { UserOrmEntity } from '@/modules/users/infrastructure/persistence/user.orm-entity';
 
-@Entity("notifications")
+@Entity('notifications')
 export class NotificationOrmEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column()
@@ -15,17 +22,17 @@ export class NotificationOrmEntity {
   @Column()
   title!: string;
 
-  @Column({ type: "text" })
+  @Column({ type: 'text' })
   message!: string;
 
   @Column({ default: false })
   isRead!: boolean;
 
-  @Column({ type: "jsonb", default: "{}" })
+  @Column({ type: 'jsonb', default: '{}' })
   metadata!: Record<string, any>;
 
   @ManyToOne(() => UserOrmEntity)
-  @JoinColumn({ name: "userId" })
+  @JoinColumn({ name: 'userId' })
   user!: UserOrmEntity;
 
   @CreateDateColumn()

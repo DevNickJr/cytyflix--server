@@ -1,10 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { UserOrmEntity } from "@/modules/users/infrastructure/persistence/user.orm-entity";
-import { PropertyOrmEntity } from "@/modules/properties/infrastructure/persistence/property.orm-entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { UserOrmEntity } from '@/modules/users/infrastructure/persistence/user.orm-entity';
+import { PropertyOrmEntity } from '@/modules/properties/infrastructure/persistence/property.orm-entity';
 
-@Entity("bookings")
+@Entity('bookings')
 export class BookingOrmEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column()
@@ -14,18 +22,18 @@ export class BookingOrmEntity {
   agentId!: string;
 
   @Column({ nullable: true })
-  propertyId!: string | null; 
+  propertyId!: string | null;
 
-  @Column({ type: "decimal" })
+  @Column({ type: 'decimal' })
   amount!: number;
 
   @Column({ unique: true })
   paymentReference!: string;
 
-  @Column({ default: "pending" })
+  @Column({ default: 'pending' })
   paymentStatus!: string;
 
-  @Column({ default: "pending" })
+  @Column({ default: 'pending' })
   bookingStatus!: string;
 
   @Column({ default: false })
@@ -34,28 +42,28 @@ export class BookingOrmEntity {
   @Column({ default: false })
   agentConfirmed!: boolean;
 
-  @Column({ type: "timestamp", nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   scheduledDate!: Date;
 
   @Column()
   scheduledTime!: string;
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: 'text', nullable: true })
   notes?: string;
 
-  @Column({ type: "timestamp", nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   expiresAt?: Date;
 
   @ManyToOne(() => UserOrmEntity)
-  @JoinColumn({ name: "clientId" })
+  @JoinColumn({ name: 'clientId' })
   client!: UserOrmEntity;
 
   @ManyToOne(() => UserOrmEntity)
-  @JoinColumn({ name: "agentId" })
+  @JoinColumn({ name: 'agentId' })
   agent!: UserOrmEntity;
 
   @ManyToOne(() => PropertyOrmEntity, { nullable: true })
-  @JoinColumn({ name: "propertyId" })
+  @JoinColumn({ name: 'propertyId' })
   property!: PropertyOrmEntity;
 
   @CreateDateColumn()

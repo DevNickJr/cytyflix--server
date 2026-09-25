@@ -1,4 +1,4 @@
-import z from "zod";
+import z from 'zod';
 
 export const CreateReviewSchema = z.object({
   body: z.object({
@@ -7,7 +7,7 @@ export const CreateReviewSchema = z.object({
   }),
 });
 
-export type CreateReviewDTO = z.infer<typeof CreateReviewSchema>["body"];
+export type CreateReviewDTO = z.infer<typeof CreateReviewSchema>['body'];
 
 export const UpdateReviewSchema = z.object({
   body: z.object({
@@ -16,4 +16,4 @@ export const UpdateReviewSchema = z.object({
   }),
 });
 
-export type UpdateReviewDTO = z.infer<typeof UpdateReviewSchema>["body"];
+export type UpdateReviewDTO = z.infer<typeof UpdateReviewSchema>['body'];

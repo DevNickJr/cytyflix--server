@@ -1,10 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  Index,
+} from 'typeorm';
 
-@Entity("analytics_events")
-@Index(["eventType", "targetId", "createdAt"])
-@Index(["eventType", "createdAt"])
+@Entity('analytics_events')
+@Index(['eventType', 'targetId', 'createdAt'])
+@Index(['eventType', 'createdAt'])
 export class AnalyticsEventOrmEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column()
@@ -16,7 +22,7 @@ export class AnalyticsEventOrmEntity {
   @Column({ nullable: true })
   userId?: string;
 
-  @Column({ type: "jsonb", nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, unknown>;
 
   @CreateDateColumn()

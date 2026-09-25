@@ -22,8 +22,8 @@ function parseStartDateTime(date: Date, time: string): Date {
     let hours = parseInt(ampmMatch[1], 10);
     const minutes = parseInt(ampmMatch[2], 10);
     const period = ampmMatch[3].toUpperCase();
-    if (period === "PM" && hours !== 12) hours += 12;
-    if (period === "AM" && hours === 12) hours = 0;
+    if (period === 'PM' && hours !== 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
     d.setHours(hours, minutes, 0, 0);
     return d;
   }
@@ -32,24 +32,33 @@ function parseStartDateTime(date: Date, time: string): Date {
 }
 
 function formatICSDate(date: Date): string {
-  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  return date
+    .toISOString()
+    .replace(/[-:]/g, '')
+    .replace(/\.\d{3}/, '');
 }
 
 function escapeICSText(text: string): string {
-  return text.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
+  return text
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\n/g, '\\n');
 }
 
 export function generateICSContent(data: ICSEventData): string {
   const start = parseStartDateTime(data.startDate, data.startTime);
-  const end = new Date(start.getTime() + (data.durationMinutes || 60) * 60 * 1000);
+  const end = new Date(
+    start.getTime() + (data.durationMinutes || 60) * 60 * 1000
+  );
 
   const lines = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//CytyFlix//Booking//EN",
-    "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH",
-    "BEGIN:VEVENT",
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//CytyFlix//Booking//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'BEGIN:VEVENT',
     `UID:${data.uid}`,
     `DTSTAMP:${formatICSDate(new Date())}`,
     `DTSTART:${formatICSDate(start)}`,
@@ -63,10 +72,12 @@ export function generateICSContent(data: ICSEventData): string {
   }
 
   if (data.organizerName && data.organizerEmail) {
-    lines.push(`ORGANIZER;CN=${escapeICSText(data.organizerName)}:mailto:${data.organizerEmail}`);
+    lines.push(
+      `ORGANIZER;CN=${escapeICSText(data.organizerName)}:mailto:${data.organizerEmail}`
+    );
   }
 
-  lines.push("END:VEVENT", "END:VCALENDAR");
+  lines.push('END:VEVENT', 'END:VCALENDAR');
 
-  return lines.join("\r\n");
+  return lines.join('\r\n');
 }

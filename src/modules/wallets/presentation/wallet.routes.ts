@@ -1,48 +1,52 @@
-import { Router } from "express";
-import { WalletController } from "./wallet.controller";
-import { AuthGuard } from "@/shared/middlewares/auth.middleware";
-import validateRequest from "@/shared/middlewares/validate-request";
-import { WithdrawSchema, AddBeneficiarySchema, ResolveAccountSchema } from "../contracts/wallet.schemas";
-import { IdParam } from "@/shared/schemas";
+import { Router } from 'express';
+import { WalletController } from './wallet.controller';
+import { AuthGuard } from '@/shared/middlewares/auth.middleware';
+import validateRequest from '@/shared/middlewares/validate-request';
+import {
+  WithdrawSchema,
+  AddBeneficiarySchema,
+  ResolveAccountSchema,
+} from '../contracts/wallet.schemas';
+import { IdParam } from '@/shared/schemas';
 
 export const walletRoutes = (controller: WalletController) => {
   const router = Router();
 
-  router.get("/", AuthGuard, controller.getBalance);
+  router.get('/', AuthGuard, controller.getBalance);
 
   router.post(
-    "/withdraw",
+    '/withdraw',
     AuthGuard,
     validateRequest([WithdrawSchema]),
-    controller.withdraw,
+    controller.withdraw
   );
 
-  router.get("/banks", AuthGuard, controller.getBanks);
+  router.get('/banks', AuthGuard, controller.getBanks);
 
   router.get(
-    "/resolve-account",
+    '/resolve-account',
     AuthGuard,
     validateRequest([ResolveAccountSchema]),
-    controller.resolveAccount,
+    controller.resolveAccount
   );
 
-  router.get("/beneficiaries", AuthGuard, controller.getBeneficiaries);
+  router.get('/beneficiaries', AuthGuard, controller.getBeneficiaries);
 
   router.post(
-    "/beneficiaries",
+    '/beneficiaries',
     AuthGuard,
     validateRequest([AddBeneficiarySchema]),
-    controller.addBeneficiary,
+    controller.addBeneficiary
   );
 
   router.delete(
-    "/beneficiaries/:id",
+    '/beneficiaries/:id',
     AuthGuard,
     validateRequest([IdParam]),
-    controller.deleteBeneficiary,
+    controller.deleteBeneficiary
   );
 
-  router.get("/transactions", AuthGuard, controller.getTransactions);
+  router.get('/transactions', AuthGuard, controller.getTransactions);
 
   return router;
 };

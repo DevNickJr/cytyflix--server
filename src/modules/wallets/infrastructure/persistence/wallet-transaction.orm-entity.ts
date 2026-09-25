@@ -1,9 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { WalletOrmEntity } from "./wallet.orm-entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { WalletOrmEntity } from './wallet.orm-entity';
 
-@Entity("wallet_transactions")
+@Entity('wallet_transactions')
 export class WalletTransactionOrmEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column()
@@ -12,10 +19,10 @@ export class WalletTransactionOrmEntity {
   @Column()
   type!: string;
 
-  @Column({ type: "decimal" })
+  @Column({ type: 'decimal' })
   amount!: number;
 
-  @Column({ type: "decimal" })
+  @Column({ type: 'decimal' })
   balanceAfter!: number;
 
   @Column()
@@ -24,14 +31,14 @@ export class WalletTransactionOrmEntity {
   @Column({ unique: true })
   reference!: string;
 
-  @Column({ type: "text" })
+  @Column({ type: 'text' })
   description!: string;
 
-  @Column({ type: "jsonb", default: {} })
+  @Column({ type: 'jsonb', default: {} })
   metadata!: Record<string, any>;
 
   @ManyToOne(() => WalletOrmEntity)
-  @JoinColumn({ name: "walletId" })
+  @JoinColumn({ name: 'walletId' })
   wallet!: WalletOrmEntity;
 
   @CreateDateColumn()

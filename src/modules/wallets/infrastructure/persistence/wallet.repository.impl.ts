@@ -1,17 +1,21 @@
-import { Repository } from "typeorm";
-import { WalletRepository } from "../../contracts/wallet.interfaces";
-import { Wallet, WalletTransaction, Beneficiary } from "../../domain/wallet";
-import { WalletOrmEntity } from "./wallet.orm-entity";
-import { WalletTransactionOrmEntity } from "./wallet-transaction.orm-entity";
-import { BeneficiaryOrmEntity } from "./beneficiary.orm-entity";
-import { WalletMapper, WalletTransactionMapper, BeneficiaryMapper } from "./wallet.mapper";
-import { PaginatedResult } from "@/modules/properties/contracts/property.interfaces";
+import { Repository } from 'typeorm';
+import { WalletRepository } from '../../contracts/wallet.interfaces';
+import { Wallet, WalletTransaction, Beneficiary } from '../../domain/wallet';
+import { WalletOrmEntity } from './wallet.orm-entity';
+import { WalletTransactionOrmEntity } from './wallet-transaction.orm-entity';
+import { BeneficiaryOrmEntity } from './beneficiary.orm-entity';
+import {
+  WalletMapper,
+  WalletTransactionMapper,
+  BeneficiaryMapper,
+} from './wallet.mapper';
+import { PaginatedResult } from '@/modules/properties/contracts/property.interfaces';
 
 export class WalletRepositoryImpl implements WalletRepository {
   constructor(
     private readonly walletOrmRepo: Repository<WalletOrmEntity>,
     private readonly transactionOrmRepo: Repository<WalletTransactionOrmEntity>,
-    private readonly beneficiaryOrmRepo: Repository<BeneficiaryOrmEntity>,
+    private readonly beneficiaryOrmRepo: Repository<BeneficiaryOrmEntity>
   ) {}
 
   async findByUserId(userId: string): Promise<Wallet | null> {
@@ -31,7 +35,9 @@ export class WalletRepositoryImpl implements WalletRepository {
       balance: newBalance,
       updatedAt: new Date(),
     });
-    const updated = await this.walletOrmRepo.findOneOrFail({ where: { id: walletId } });
+    const updated = await this.walletOrmRepo.findOneOrFail({
+      where: { id: walletId },
+    });
     return WalletMapper.toDomain(updated);
   }
 
@@ -41,10 +47,14 @@ export class WalletRepositoryImpl implements WalletRepository {
     return WalletTransactionMapper.toDomain(saved);
   }
 
-  async findTransactionsByWalletId(walletId: string, page: number, limit: number): Promise<PaginatedResult<WalletTransaction>> {
+  async findTransactionsByWalletId(
+    walletId: string,
+    page: number,
+    limit: number
+  ): Promise<PaginatedResult<WalletTransaction>> {
     const [entities, total] = await this.transactionOrmRepo.findAndCount({
       where: { walletId },
-      order: { createdAt: "DESC" },
+      order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
     });
@@ -58,8 +68,12 @@ export class WalletRepositoryImpl implements WalletRepository {
     };
   }
 
-  async findTransactionByReference(reference: string): Promise<WalletTransaction | null> {
-    const entity = await this.transactionOrmRepo.findOne({ where: { reference } });
+  async findTransactionByReference(
+    reference: string
+  ): Promise<WalletTransaction | null> {
+    const entity = await this.transactionOrmRepo.findOne({
+      where: { reference },
+    });
     if (!entity) return null;
     return WalletTransactionMapper.toDomain(entity);
   }
@@ -73,7 +87,7 @@ export class WalletRepositoryImpl implements WalletRepository {
   async findBeneficiariesByUserId(userId: string): Promise<Beneficiary[]> {
     const entities = await this.beneficiaryOrmRepo.find({
       where: { userId },
-      order: { createdAt: "DESC" },
+      order: { createdAt: 'DESC' },
     });
     return entities.map(BeneficiaryMapper.toDomain);
   }
@@ -84,7 +98,11 @@ export class WalletRepositoryImpl implements WalletRepository {
     return BeneficiaryMapper.toDomain(entity);
   }
 
-  async findBeneficiaryByAccount(userId: string, bankCode: string, accountNumber: string): Promise<Beneficiary | null> {
+  async findBeneficiaryByAccount(
+    userId: string,
+    bankCode: string,
+    accountNumber: string
+  ): Promise<Beneficiary | null> {
     const entity = await this.beneficiaryOrmRepo.findOne({
       where: { userId, bankCode, accountNumber },
     });

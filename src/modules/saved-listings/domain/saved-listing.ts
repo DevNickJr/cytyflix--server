@@ -3,6 +3,6 @@ export class SavedListing {
     public readonly id: string,
     public userId: string,
     public propertyId: string,
-    public createdAt: Date = new Date(),
+    public createdAt: Date = new Date()
   ) {}
 }

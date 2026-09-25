@@ -1,2 +1,2 @@
-export { startEmailConsumer } from "./email.consumer";
-export { startNotificationConsumer } from "./notification.consumer";
+export { startEmailConsumer } from './email.consumer';
+export { startNotificationConsumer } from './notification.consumer';

@@ -1,5 +1,8 @@
-import { AgentVerification, VerificationStatus } from "../../domain/agent-verification";
-import { AgentVerificationOrmEntity } from "./agent-verification.orm-entity";
+import {
+  AgentVerification,
+  VerificationStatus,
+} from '../../domain/agent-verification';
+import { AgentVerificationOrmEntity } from './agent-verification.orm-entity';
 
 export class AgentVerificationMapper {
   static toDomain(entity: AgentVerificationOrmEntity): AgentVerification {
@@ -8,7 +11,7 @@ export class AgentVerificationMapper {
       entity.userId,
       entity.idDocumentUrl,
       entity.selfieUrl,
-      entity.utilityBillUrl || "",
+      entity.utilityBillUrl || '',
       entity.ninNumber,
       entity.ninVerified ?? false,
       entity.ninData,
@@ -17,11 +20,13 @@ export class AgentVerificationMapper {
       entity.reviewedBy,
       entity.reviewedAt,
       entity.createdAt,
-      entity.updatedAt,
+      entity.updatedAt
     );
   }
 
-  static toPersistence(verification: AgentVerification): AgentVerificationOrmEntity {
+  static toPersistence(
+    verification: AgentVerification
+  ): AgentVerificationOrmEntity {
     const entity = new AgentVerificationOrmEntity();
     entity.id = verification.id;
     entity.userId = verification.userId;

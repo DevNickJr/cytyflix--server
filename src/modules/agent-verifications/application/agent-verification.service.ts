@@ -1,36 +1,51 @@
-import crypto from "crypto";
-import { AgentVerification, VerificationStatus } from "../domain/agent-verification";
-import { AgentVerificationRepository } from "../contracts/agent-verification.interfaces";
-import { SubmitVerificationDTO, ReviewVerificationDTO } from "../contracts/agent-verification.schemas";
-import { UserRepository, RolesEnum } from "@/modules/users/contracts/user.interfaces";
-import { rabbitMQ } from "@/infrastructure/messaging/rabbitmq";
-import { publishEvent } from "@/infrastructure/messaging/event-bus";
+import crypto from 'crypto';
+import {
+  AgentVerification,
+  VerificationStatus,
+} from '../domain/agent-verification';
+import { AgentVerificationRepository } from '../contracts/agent-verification.interfaces';
+import {
+  SubmitVerificationDTO,
+  ReviewVerificationDTO,
+} from '../contracts/agent-verification.schemas';
+import {
+  UserRepository,
+  RolesEnum,
+} from '@/modules/users/contracts/user.interfaces';
+import { rabbitMQ } from '@/infrastructure/messaging/rabbitmq';
+import { publishEvent } from '@/infrastructure/messaging/event-bus';
 import {
   VERIFICATION_APPROVED,
   VERIFICATION_REJECTED,
   VerificationApprovedPayload,
   VerificationRejectedPayload,
-} from "@/infrastructure/messaging/events";
-import { notificationService } from "@/modules/notifications/notification.module";
-import { sendEmail } from "@/infrastructure/email";
-import { verificationApprovedEmail, verificationRejectedEmail } from "@/infrastructure/email/templates";
-import { verifyVNIN } from "@/infrastructure/identity/dojah";
-import env from "@/configs/env.config";
-import CustomError from "@/shared/utils/custom-error";
+} from '@/infrastructure/messaging/events';
+import { notificationService } from '@/modules/notifications/notification.module';
+import { sendEmail } from '@/infrastructure/email';
+import {
+  verificationApprovedEmail,
+  verificationRejectedEmail,
+} from '@/infrastructure/email/templates';
+import { verifyVNIN } from '@/infrastructure/identity/dojah';
+import env from '@/configs/env.config';
+import CustomError from '@/shared/utils/custom-error';
 
 export class AgentVerificationService {
   constructor(
     private readonly verificationRepo: AgentVerificationRepository,
-    private readonly userRepo: UserRepository,
+    private readonly userRepo: UserRepository
   ) {}
 
   async submit(userId: string, dto: SubmitVerificationDTO) {
     const existing = await this.verificationRepo.findByUserId(userId);
     if (existing && existing.status === VerificationStatus.PENDING) {
-      throw new CustomError("You already have a pending verification request", 400);
+      throw new CustomError(
+        'You already have a pending verification request',
+        400
+      );
     }
     if (existing && existing.status === VerificationStatus.APPROVED) {
-      throw new CustomError("You are already a verified agent", 400);
+      throw new CustomError('You are already a verified agent', 400);
     }
 
     // Verify vNIN with Dojah if provided and Dojah is configured
@@ -41,8 +56,12 @@ export class AgentVerificationService {
         const result = await verifyVNIN(dto.ninNumber);
         ninVerified = true;
         ninData = result as unknown as Record<string, unknown>;
-      } catch (error: any) {
-        throw new CustomError(error.message || "NIN verification failed. Please check your Virtual NIN and try again.", 400);
+      } catch (error: unknown) {
+        throw new CustomError(
+          (error as { message?: string })?.message ||
+            'NIN verification failed. Please check your Virtual NIN and try again.',
+          400
+        );
       }
     }
 
@@ -69,17 +88,21 @@ export class AgentVerificationService {
       dto.utilityBillUrl,
       dto.ninNumber,
       ninVerified,
-      ninData,
+      ninData
     );
 
     return this.verificationRepo.create(verification);
   }
 
-  async review(verificationId: string, reviewerId: string, dto: ReviewVerificationDTO) {
+  async review(
+    verificationId: string,
+    reviewerId: string,
+    dto: ReviewVerificationDTO
+  ) {
     const verification = await this.verificationRepo.findById(verificationId);
-    if (!verification) throw new CustomError("Verification not found", 404);
+    if (!verification) throw new CustomError('Verification not found', 404);
     if (verification.status !== VerificationStatus.PENDING) {
-      throw new CustomError("This verification has already been reviewed", 400);
+      throw new CustomError('This verification has already been reviewed', 400);
     }
 
     verification.status = dto.status as VerificationStatus;
@@ -87,10 +110,12 @@ export class AgentVerificationService {
     verification.reviewedAt = new Date();
 
     const user = await this.userRepo.findById(verification.userId);
-    const userName = user?.profile ? `${user.profile.firstName} ${user.profile.lastName}`.trim() : "User";
-    const userEmail = user?.email || "";
+    const userName = user?.profile
+      ? `${user.profile.firstName} ${user.profile.lastName}`.trim()
+      : 'User';
+    const userEmail = user?.email || '';
 
-    if (dto.status === "approved") {
+    if (dto.status === 'approved') {
       if (user) {
         user.role = RolesEnum.AGENT;
         await this.userRepo.update(user);
@@ -104,7 +129,7 @@ export class AgentVerificationService {
       };
 
       if (rabbitMQ.isConnected()) {
-        publishEvent("verification.approved", {
+        publishEvent('verification.approved', {
           type: VERIFICATION_APPROVED,
           payload: payload as unknown as Record<string, unknown>,
           timestamp: new Date().toISOString(),
@@ -112,21 +137,22 @@ export class AgentVerificationService {
       } else {
         await notificationService.createNotification({
           userId: verification.userId,
-          type: "system",
-          title: "Verification Approved",
-          message: "Your agent verification has been approved. You can now operate as an agent on CytyFlix.",
+          type: 'system',
+          title: 'Verification Approved',
+          message:
+            'Your agent verification has been approved. You can now operate as an agent on CytyFlix.',
           metadata: { verificationId: verification.id },
         });
         try {
           const template = verificationApprovedEmail({ agentName: userName });
           await sendEmail({ to: userEmail, ...template });
         } catch (emailError) {
-          console.error("Fallback email send failed:", emailError);
+          console.error('Fallback email send failed:', emailError);
         }
       }
     } else {
       verification.rejectionReason = dto.rejectionReason;
-      const reason = dto.rejectionReason || "Not specified";
+      const reason = dto.rejectionReason || 'Not specified';
 
       const payload: VerificationRejectedPayload = {
         verificationId: verification.id,
@@ -137,7 +163,7 @@ export class AgentVerificationService {
       };
 
       if (rabbitMQ.isConnected()) {
-        publishEvent("verification.rejected", {
+        publishEvent('verification.rejected', {
           type: VERIFICATION_REJECTED,
           payload: payload as unknown as Record<string, unknown>,
           timestamp: new Date().toISOString(),
@@ -145,16 +171,19 @@ export class AgentVerificationService {
       } else {
         await notificationService.createNotification({
           userId: verification.userId,
-          type: "system",
-          title: "Verification Rejected",
+          type: 'system',
+          title: 'Verification Rejected',
           message: `Your agent verification was rejected. Reason: ${reason}`,
           metadata: { verificationId: verification.id },
         });
         try {
-          const template = verificationRejectedEmail({ agentName: userName, reason });
+          const template = verificationRejectedEmail({
+            agentName: userName,
+            reason,
+          });
           await sendEmail({ to: userEmail, ...template });
         } catch (emailError) {
-          console.error("Fallback email send failed:", emailError);
+          console.error('Fallback email send failed:', emailError);
         }
       }
     }
@@ -172,7 +201,7 @@ export class AgentVerificationService {
 
   async getOne(id: string) {
     const verification = await this.verificationRepo.findById(id);
-    if (!verification) throw new CustomError("Verification not found", 404);
+    if (!verification) throw new CustomError('Verification not found', 404);
     return verification;
   }
 }

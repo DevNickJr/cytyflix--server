@@ -1,9 +1,9 @@
 export enum AgreementStatus {
-  DRAFT = "draft",
-  PENDING_TENANT = "pending_tenant",
-  PENDING_LANDLORD = "pending_landlord",
-  SIGNED = "signed",
-  EXPIRED = "expired",
+  DRAFT = 'draft',
+  PENDING_TENANT = 'pending_tenant',
+  PENDING_LANDLORD = 'pending_landlord',
+  SIGNED = 'signed',
+  EXPIRED = 'expired',
 }
 
 export class TenancyAgreement {
@@ -19,6 +19,6 @@ export class TenancyAgreement {
     public tenantSignedAt: Date | null,
     public status: AgreementStatus,
     public createdAt: Date = new Date(),
-    public updatedAt: Date = new Date(),
+    public updatedAt: Date = new Date()
   ) {}
 }

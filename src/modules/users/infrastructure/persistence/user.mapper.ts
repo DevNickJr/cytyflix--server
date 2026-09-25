@@ -1,7 +1,7 @@
-import { RolesEnum } from "@/modules/users/contracts/user.interfaces";
-import { User, UserProfile } from "../../domain/user";
-import { UserOrmEntity } from "./user.orm-entity";
-import { UserProfileOrmEntity } from "./user-profile.orm-entity";
+import { RolesEnum } from '@/modules/users/contracts/user.interfaces';
+import { User, UserProfile } from '../../domain/user';
+import { UserOrmEntity } from './user.orm-entity';
+import { UserProfileOrmEntity } from './user-profile.orm-entity';
 
 export class UserMapper {
   static toDomain(entity: UserOrmEntity): User {
@@ -10,9 +10,9 @@ export class UserMapper {
     if (entity.profile) {
       profile = new UserProfile(
         entity.profile.id,
-        entity.profile.firstName || "",
-        entity.profile.lastName || "",
-        entity.profile.phoneNumber || "",
+        entity.profile.firstName || '',
+        entity.profile.lastName || '',
+        entity.profile.phoneNumber || '',
         entity.profile.bio,
         entity.profile.preferredLocation,
         entity.profile.budgetMin ? Number(entity.profile.budgetMin) : undefined,
@@ -21,7 +21,7 @@ export class UserMapper {
         entity.profile.operatingStates,
         entity.profile.operatingLgas,
         entity.profile.operatingCities,
-        entity.profile.slug,
+        entity.profile.slug
       );
     }
 
@@ -33,7 +33,7 @@ export class UserMapper {
       entity.isVerified,
       profile,
       entity.createdAt,
-      entity.updatedAt,
+      entity.updatedAt
     );
   }
 

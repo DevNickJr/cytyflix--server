@@ -1,4 +1,4 @@
-import z from "zod";
+import z from 'zod';
 
 export const CreateRentPaymentSchema = z.object({
   body: z.object({
@@ -9,4 +9,6 @@ export const CreateRentPaymentSchema = z.object({
   }),
 });
 
-export type CreateRentPaymentDTO = z.infer<typeof CreateRentPaymentSchema>["body"];
+export type CreateRentPaymentDTO = z.infer<
+  typeof CreateRentPaymentSchema
+>['body'];

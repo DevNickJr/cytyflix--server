@@ -53,8 +53,7 @@ const validateRequest =
       console.log(req.query);
 
       next();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
+    } catch (e) {
       // res.status(400).json({
       //   success: false,
       //   message:
@@ -65,13 +64,13 @@ const validateRequest =
       // });
       console.log(e);
 
-      const firstIssue = e.issues?.[0];
+      const firstIssue = (e as { issues: { message: string }[] }).issues?.[0];
       logger.error('validation failed -');
 
       res.status(400).json({
         success: false,
         message: firstIssue?.message || 'Validation failed',
-        errors: e.issues || e,
+        errors: (e as { issues: { message: string }[] }).issues || e,
       });
     }
   };

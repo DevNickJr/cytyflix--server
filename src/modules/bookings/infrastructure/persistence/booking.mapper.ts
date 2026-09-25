@@ -1,5 +1,5 @@
-import { Booking, PaymentStatus, BookingStatus } from "../../domain/booking";
-import { BookingOrmEntity } from "./booking.orm-entity";
+import { Booking, PaymentStatus, BookingStatus } from '../../domain/booking';
+import { BookingOrmEntity } from './booking.orm-entity';
 
 export class BookingMapper {
   static toDomain(entity: BookingOrmEntity): Booking {
@@ -19,7 +19,7 @@ export class BookingMapper {
       entity.notes,
       entity.expiresAt,
       entity.createdAt,
-      entity.updatedAt,
+      entity.updatedAt
     );
   }
 

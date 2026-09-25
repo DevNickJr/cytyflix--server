@@ -1,15 +1,15 @@
 export enum ReportReason {
-  MISLEADING = "misleading",
-  SCAM = "scam",
-  INAPPROPRIATE = "inappropriate",
-  DUPLICATE = "duplicate",
-  OTHER = "other",
+  MISLEADING = 'misleading',
+  SCAM = 'scam',
+  INAPPROPRIATE = 'inappropriate',
+  DUPLICATE = 'duplicate',
+  OTHER = 'other',
 }
 
 export enum ReportStatus {
-  PENDING = "pending",
-  REVIEWED = "reviewed",
-  DISMISSED = "dismissed",
+  PENDING = 'pending',
+  REVIEWED = 'reviewed',
+  DISMISSED = 'dismissed',
 }
 
 export class Report {
@@ -23,6 +23,6 @@ export class Report {
     public reviewedBy?: string,
     public reviewedAt?: Date,
     public createdAt: Date = new Date(),
-    public updatedAt: Date = new Date(),
+    public updatedAt: Date = new Date()
   ) {}
 }

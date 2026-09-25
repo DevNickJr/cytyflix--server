@@ -1,5 +1,5 @@
-import { SavedListing } from "../../domain/saved-listing";
-import { SavedListingOrmEntity } from "./saved-listing.orm-entity";
+import { SavedListing } from '../../domain/saved-listing';
+import { SavedListingOrmEntity } from './saved-listing.orm-entity';
 
 export class SavedListingMapper {
   static toDomain(entity: SavedListingOrmEntity): SavedListing {
@@ -7,7 +7,7 @@ export class SavedListingMapper {
       entity.id,
       entity.userId,
       entity.propertyId,
-      entity.createdAt,
+      entity.createdAt
     );
   }
 

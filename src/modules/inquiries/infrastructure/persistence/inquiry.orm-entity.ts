@@ -1,10 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { UserOrmEntity } from "@/modules/users/infrastructure/persistence/user.orm-entity";
-import { PropertyOrmEntity } from "@/modules/properties/infrastructure/persistence/property.orm-entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { UserOrmEntity } from '@/modules/users/infrastructure/persistence/user.orm-entity';
+import { PropertyOrmEntity } from '@/modules/properties/infrastructure/persistence/property.orm-entity';
 
-@Entity("inquiries")
+@Entity('inquiries')
 export class InquiryOrmEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column()
@@ -16,22 +24,22 @@ export class InquiryOrmEntity {
   @Column()
   recipientId!: string;
 
-  @Column({ type: "text" })
+  @Column({ type: 'text' })
   message!: string;
 
-  @Column({ default: "pending" })
+  @Column({ default: 'pending' })
   status!: string;
 
   @ManyToOne(() => UserOrmEntity)
-  @JoinColumn({ name: "senderId" })
+  @JoinColumn({ name: 'senderId' })
   sender!: UserOrmEntity;
 
   @ManyToOne(() => UserOrmEntity)
-  @JoinColumn({ name: "recipientId" })
+  @JoinColumn({ name: 'recipientId' })
   recipient!: UserOrmEntity;
 
   @ManyToOne(() => PropertyOrmEntity)
-  @JoinColumn({ name: "propertyId" })
+  @JoinColumn({ name: 'propertyId' })
   property!: PropertyOrmEntity;
 
   @CreateDateColumn()

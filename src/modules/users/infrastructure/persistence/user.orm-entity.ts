@@ -1,10 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne } from "typeorm";
-import { UserProfileOrmEntity } from "./user-profile.orm-entity";
-import { RolesEnum } from "@/shared/interfaces";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToOne,
+} from 'typeorm';
+import { UserProfileOrmEntity } from './user-profile.orm-entity';
+import { RolesEnum } from '@/shared/interfaces';
 
-@Entity("users")
+@Entity('users')
 export class UserOrmEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column({ unique: true })
@@ -13,10 +20,10 @@ export class UserOrmEntity {
   @Column()
   password!: string;
 
-  @Column({ 
+  @Column({
     // type: "enum",
     // enum: RolesEnum,
-    default: RolesEnum.RENT_SEEKER 
+    default: RolesEnum.RENT_SEEKER,
   })
   role!: string;
   // role!: RolesEnum;
@@ -24,7 +31,10 @@ export class UserOrmEntity {
   @Column({ default: true }) // TODO: change this to false in production WHEN we set up email verification
   isVerified!: boolean;
 
-  @OneToOne(() => UserProfileOrmEntity, profile => profile.user, { cascade: true, eager: true })
+  @OneToOne(() => UserProfileOrmEntity, profile => profile.user, {
+    cascade: true,
+    eager: true,
+  })
   profile?: UserProfileOrmEntity;
 
   @CreateDateColumn()

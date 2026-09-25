@@ -1,4 +1,4 @@
-import z from "zod";
+import z from 'zod';
 
 export const WithdrawSchema = z.object({
   body: z.object({
@@ -10,7 +10,7 @@ export const WithdrawSchema = z.object({
   }),
 });
 
-export type WithdrawDTO = z.infer<typeof WithdrawSchema>["body"];
+export type WithdrawDTO = z.infer<typeof WithdrawSchema>['body'];
 
 export const AddBeneficiarySchema = z.object({
   body: z.object({
@@ -21,7 +21,7 @@ export const AddBeneficiarySchema = z.object({
   }),
 });
 
-export type AddBeneficiaryDTO = z.infer<typeof AddBeneficiarySchema>["body"];
+export type AddBeneficiaryDTO = z.infer<typeof AddBeneficiarySchema>['body'];
 
 export const ResolveAccountSchema = z.object({
   query: z.object({
@@ -30,4 +30,4 @@ export const ResolveAccountSchema = z.object({
   }),
 });
 
-export type ResolveAccountDTO = z.infer<typeof ResolveAccountSchema>["query"];
+export type ResolveAccountDTO = z.infer<typeof ResolveAccountSchema>['query'];

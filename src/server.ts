@@ -1,10 +1,13 @@
-import "reflect-metadata" // to allow decorators work well (typeorm)
-import env from "@/configs/env.config"
-import { connectDB } from "@/infrastructure/database/connect.db"
-import { rabbitMQ } from "@/infrastructure/messaging/rabbitmq"
-import { startEmailConsumer, startNotificationConsumer } from "@/infrastructure/messaging/consumers"
-import { initializeScheduler } from "@/infrastructure/scheduler/cron"
-import { app } from "./app";
+import 'reflect-metadata'; // to allow decorators work well (typeorm)
+import env from '@/configs/env.config';
+import { connectDB } from '@/infrastructure/database/connect.db';
+import { rabbitMQ } from '@/infrastructure/messaging/rabbitmq';
+import {
+  startEmailConsumer,
+  startNotificationConsumer,
+} from '@/infrastructure/messaging/consumers';
+import { initializeScheduler } from '@/infrastructure/scheduler/cron';
+import { app } from './app';
 
 const PORT = Number(process.env.PORT) || env.PORT;
 
@@ -20,21 +23,18 @@ async function bootstrap() {
       await startNotificationConsumer(channel);
     }
   } catch (error) {
-    console.error("RabbitMQ initialization failed (non-blocking):", error);
+    console.error('RabbitMQ initialization failed (non-blocking):', error);
   }
 
   // Initialize cron scheduler for auto-release jobs
   initializeScheduler();
 
-  app.listen(PORT, (err) => {
+  app.listen(PORT, err => {
     if (err) {
-        console.log(`Failed to start DB - Shutting down`)
+      console.log(`Failed to start DB - Shutting down`);
     }
     console.log(`Server running on ${PORT}`);
-  })
+  });
 }
-
-
-
 
 bootstrap();

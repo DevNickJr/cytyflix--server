@@ -1,8 +1,8 @@
 export enum NotificationType {
-  INQUIRY_RECEIVED = "inquiry_received",
-  INQUIRY_RESPONDED = "inquiry_responded",
-  LISTING_SAVED = "listing_saved",
-  SYSTEM = "system",
+  INQUIRY_RECEIVED = 'inquiry_received',
+  INQUIRY_RESPONDED = 'inquiry_responded',
+  LISTING_SAVED = 'listing_saved',
+  SYSTEM = 'system',
 }
 
 export class Notification {
@@ -14,6 +14,6 @@ export class Notification {
     public message: string,
     public isRead: boolean = false,
     public metadata: Record<string, any> = {},
-    public createdAt: Date = new Date(),
+    public createdAt: Date = new Date()
   ) {}
 }
