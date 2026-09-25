@@ -13,5 +13,5 @@ export const AppDataSource = new DataSource({
       '/../../modules/**/infrastructure/persistence/*.orm-entity.{js,ts}',
   ],
   logging: env.NODE_ENV === 'development',
-  synchronize: env.NODE_ENV === 'development',
+  synchronize: true,
 });
