@@ -16,18 +16,14 @@ export async function generateReceiptPDF(data: ReceiptData): Promise<Buffer> {
   const doc = new PDFDocument({ size: 'A4', margin: 50 });
   const chunks: Buffer[] = [];
 
-  // 2. Set up synchronous stream collectors
+  // 2. Attach chunk buffer listeners synchronously
   doc.on('data', (chunk: Buffer) => chunks.push(chunk));
 
-  // 3. Create a clean promise wrapper just for the stream finalization
+  // 3. Create a synchronous Promise wrapper ONLY for resolving completion events
   const pdfBufferPromise = new Promise<Buffer>((resolve, reject) => {
     doc.on('end', () => resolve(Buffer.concat(chunks)));
     doc.on('error', reject);
   });
-
-  // 4. You can now use your `await` calls safely here at the top level of the function
-  // (e.g., if you are fetching assets or external resources on lines 107 / 143)
-
   // --- Header ---
   doc
     .fontSize(24)
