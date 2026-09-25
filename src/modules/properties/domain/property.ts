@@ -3,13 +3,18 @@ export enum PropertyType {
   HOUSE = 'house',
   STUDIO = 'studio',
   DUPLEX = 'duplex',
+  BUNGALOW = 'bungalow',
   SELF_CONTAIN = 'self_contain',
   SHARED = 'shared',
+  LAND = 'land',
+  OFFICE = 'office',
+  WAREHOUSE = 'warehouse',
 }
 
 export enum ListingType {
   RENT = 'rent',
   SHORTLET = 'shortlet',
+  SALE = 'sale',
 }
 
 export class Property {
