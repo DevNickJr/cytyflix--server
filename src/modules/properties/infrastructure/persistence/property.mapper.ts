@@ -24,9 +24,10 @@ export class PropertyMapper {
       entity.bathrooms,
       entity.amenities || [],
       entity.proofOfOwnership || [],
-      entity.interiorImages || [],
-      entity.exteriorImages || [],
-      entity.streetImages || [],
+      entity.images || [],
+      // entity.interiorImages || [],
+      // entity.exteriorImages || [],
+      // entity.streetImages || [],
       entity.walkthroughVideo || '',
       entity.isAvailable,
       entity.isFeatured,
@@ -59,9 +60,10 @@ export class PropertyMapper {
     entity.bathrooms = property.bathrooms;
     entity.amenities = property.amenities;
     entity.proofOfOwnership = property.proofOfOwnership;
-    entity.interiorImages = property.interiorImages;
-    entity.exteriorImages = property.exteriorImages;
-    entity.streetImages = property.streetImages;
+    entity.images = property.images;
+    // entity.interiorImages = property.interiorImages;
+    // entity.exteriorImages = property.exteriorImages;
+    // entity.streetImages = property.streetImages;
     entity.walkthroughVideo = property.walkthroughVideo;
     entity.isAvailable = property.isAvailable;
     entity.isFeatured = property.isFeatured;

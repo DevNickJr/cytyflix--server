@@ -31,13 +31,16 @@ export const CreatePropertySchema = z.object({
     bathrooms: z.number().int().min(0).default(1),
     amenities: z.array(z.string()).default([]),
     proofOfOwnership: z.array(z.string().url()).default([]),
-    interiorImages: z
+    images: z
       .array(z.string().url())
       .min(1, 'At least one interior image required'),
-    exteriorImages: z
-      .array(z.string().url())
-      .min(1, 'At least one exterior image required'),
-    streetImages: z.array(z.string().url()).default([]),
+    // interiorImages: z
+    //   .array(z.string().url())
+    //   .min(1, 'At least one interior image required'),
+    // exteriorImages: z
+    //   .array(z.string().url())
+    //   .min(1, 'At least one exterior image required'),
+    // streetImages: z.array(z.string().url()).default([]),
     walkthroughVideo: z
       .string()
       .url('Valid walkthrough video URL is required')

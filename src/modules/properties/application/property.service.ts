@@ -40,9 +40,10 @@ export class PropertyService {
       dto.bathrooms,
       dto.amenities,
       dto.proofOfOwnership,
-      dto.interiorImages,
-      dto.exteriorImages,
-      dto.streetImages,
+      dto.images,
+      // dto.interiorImages,
+      // dto.exteriorImages,
+      // dto.streetImages,
       dto.walkthroughVideo,
       true,
       false,
@@ -96,12 +97,13 @@ export class PropertyService {
     if (dto.amenities !== undefined) property.amenities = dto.amenities;
     if (dto.proofOfOwnership !== undefined)
       property.proofOfOwnership = dto.proofOfOwnership;
-    if (dto.interiorImages !== undefined)
-      property.interiorImages = dto.interiorImages;
-    if (dto.exteriorImages !== undefined)
-      property.exteriorImages = dto.exteriorImages;
-    if (dto.streetImages !== undefined)
-      property.streetImages = dto.streetImages;
+    if (dto.images !== undefined) property.images = dto.images;
+    // if (dto.interiorImages !== undefined)
+    //   property.interiorImages = dto.interiorImages;
+    // if (dto.exteriorImages !== undefined)
+    //   property.exteriorImages = dto.exteriorImages;
+    // if (dto.streetImages !== undefined)
+    //   property.streetImages = dto.streetImages;
     if (dto.walkthroughVideo !== undefined)
       property.walkthroughVideo = dto.walkthroughVideo;
 

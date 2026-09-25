@@ -73,6 +73,9 @@ export class PropertyOrmEntity {
   proofOfOwnership!: string[];
 
   @Column({ type: 'jsonb', default: '[]' })
+  images!: string[];
+
+  @Column({ type: 'jsonb', default: '[]' })
   interiorImages!: string[];
 
   @Column({ type: 'jsonb', default: '[]' })
