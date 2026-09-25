@@ -1,14 +1,15 @@
-import { Raw, Repository } from "typeorm";
-import { SearchByLocationQuery, UserRepository } from "@/modules/users/contracts/user.interfaces";
-import { User } from "@/modules/users/domain/user";
-import { PaginatedResult } from "@/modules/properties/contracts/property.interfaces";
-import { UserOrmEntity } from "./user.orm-entity";
-import { UserMapper } from "./user.mapper";
+import { Raw, Repository } from 'typeorm';
+import {
+  SearchByLocationQuery,
+  UserRepository,
+} from '@/modules/users/contracts/user.interfaces';
+import { User } from '@/modules/users/domain/user';
+import { PaginatedResult } from '@/modules/properties/contracts/property.interfaces';
+import { UserOrmEntity } from './user.orm-entity';
+import { UserMapper } from './user.mapper';
 
 export class UserRepositoryImpl implements UserRepository {
-  constructor(
-    private readonly ormRepo: Repository<UserOrmEntity>
-  ) {}
+  constructor(private readonly ormRepo: Repository<UserOrmEntity>) {}
 
   async create(user: User): Promise<User> {
     const entity = UserMapper.toPersistence(user);
@@ -20,8 +21,8 @@ export class UserRepositoryImpl implements UserRepository {
     const entity = await this.ormRepo.findOne({
       where: { id },
       relations: {
-        profile: true
-      }
+        profile: true,
+      },
     });
     if (!entity) return null;
 
@@ -53,22 +54,42 @@ export class UserRepositoryImpl implements UserRepository {
     return count > 0;
   }
 
-  async findByRole(role: string, query: SearchByLocationQuery): Promise<PaginatedResult<User>> {
+  async findByRole(
+    role: string,
+    query: SearchByLocationQuery
+  ): Promise<PaginatedResult<User>> {
     const [entities, total] = await this.ormRepo.findAndCount({
-      where: { 
+      where: {
         role,
         profile: {
-          ...(query.state ? { operatingStates: Raw((alias) => `:state = ANY(${alias})`, { state: query.state }) } : {}),
-          ...(query.city ? { operatingCities: Raw((alias) => `:city = ANY(${alias})`, { city: query.city }) } : {}),
-          ...(query.lga ? { operatingLgas: Raw((alias) => `:lga = ANY(${alias})`, { lga: query.lga }) } : {}),
-          
-        }
+          ...(query.state
+            ? {
+                operatingStates: Raw(alias => `:state = ANY(${alias})`, {
+                  state: query.state,
+                }),
+              }
+            : {}),
+          ...(query.city
+            ? {
+                operatingCities: Raw(alias => `:city = ANY(${alias})`, {
+                  city: query.city,
+                }),
+              }
+            : {}),
+          ...(query.lga
+            ? {
+                operatingLgas: Raw(alias => `:lga = ANY(${alias})`, {
+                  lga: query.lga,
+                }),
+              }
+            : {}),
+        },
         // profile: {
         //   ...(query.lga ? { operatingLgas: In([query.lga]) } : {}),
         //   ...(query.city ? { operatingCities: In([query.city]) } : {}),
         // }
       },
-      order: { createdAt: query.sortOrder === "ASC" ? "ASC" : "DESC" },
+      order: { createdAt: query.sortOrder === 'ASC' ? 'ASC' : 'DESC' },
       skip: (query.page - 1) * query.limit,
       take: query.limit,
       relations: { profile: true },

@@ -1,8 +1,19 @@
-import crypto from "crypto";
-import { Property } from "@/modules/properties/domain/property";
-import { PropertyRepository, SearchFilters } from "@/modules/properties/contracts/property.interfaces";
-import { CreatePropertyDTO, UpdatePropertyDTO, SearchPropertyQuery } from "@/modules/properties/contracts/property.schemas";
-import CustomError from "@/shared/utils/custom-error";
+import crypto from 'crypto';
+import {
+  ListingType,
+  Property,
+  PropertyType,
+} from '@/modules/properties/domain/property';
+import {
+  PropertyRepository,
+  SearchFilters,
+} from '@/modules/properties/contracts/property.interfaces';
+import {
+  CreatePropertyDTO,
+  UpdatePropertyDTO,
+  SearchPropertyQuery,
+} from '@/modules/properties/contracts/property.schemas';
+import CustomError from '@/shared/utils/custom-error';
 
 export class PropertyService {
   constructor(private readonly propertyRepo: PropertyRepository) {}
@@ -12,9 +23,11 @@ export class PropertyService {
       crypto.randomUUID(),
       dto.title,
       dto.description,
-      dto.propertyType as any,
-      dto.listingType as any,
+      dto.propertyType as PropertyType,
+      dto.listingType as ListingType,
       dto.price,
+      dto.pricePeriod,
+      dto.negotiable,
       dto.currency,
       dto.address,
       dto.city,
@@ -35,7 +48,7 @@ export class PropertyService {
       false,
       false,
       undefined,
-      ownerId,
+      ownerId
     );
 
     return this.propertyRepo.create(property);
@@ -43,26 +56,33 @@ export class PropertyService {
 
   async getProperty(id: string) {
     const property = await this.propertyRepo.findById(id);
-    if (!property) throw new CustomError("Property not found", 404);
+    if (!property) throw new CustomError('Property not found', 404);
     return property;
   }
 
   async getPropertiesByOwner(query: {
-    ownerId: string, page: number, limit: number
+    ownerId: string;
+    page: number;
+    limit: number;
   }) {
     return this.propertyRepo.findByOwnerId(query.ownerId, query);
   }
 
   async updateProperty(id: string, ownerId: string, dto: UpdatePropertyDTO) {
     const property = await this.propertyRepo.findById(id);
-    if (!property) throw new CustomError("Property not found", 404);
-    if (property.ownerId !== ownerId) throw new CustomError("You can only update your own listings", 403);
+    if (!property) throw new CustomError('Property not found', 404);
+    if (property.ownerId !== ownerId)
+      throw new CustomError('You can only update your own listings', 403);
 
     if (dto.title !== undefined) property.title = dto.title;
     if (dto.description !== undefined) property.description = dto.description;
-    if (dto.propertyType !== undefined) property.propertyType = dto.propertyType as any;
-    if (dto.listingType !== undefined) property.listingType = dto.listingType as any;
+    if (dto.propertyType !== undefined)
+      property.propertyType = dto.propertyType as PropertyType;
+    if (dto.listingType !== undefined)
+      property.listingType = dto.listingType as ListingType;
     if (dto.price !== undefined) property.price = dto.price;
+    if (dto.pricePeriod !== undefined) property.pricePeriod = dto.pricePeriod;
+    if (dto.negotiable !== undefined) property.negotiable = dto.negotiable;
     if (dto.currency !== undefined) property.currency = dto.currency;
     if (dto.address !== undefined) property.address = dto.address;
     if (dto.city !== undefined) property.city = dto.city;
@@ -74,19 +94,25 @@ export class PropertyService {
     if (dto.bedrooms !== undefined) property.bedrooms = dto.bedrooms;
     if (dto.bathrooms !== undefined) property.bathrooms = dto.bathrooms;
     if (dto.amenities !== undefined) property.amenities = dto.amenities;
-    if (dto.proofOfOwnership !== undefined) property.proofOfOwnership = dto.proofOfOwnership;
-    if (dto.interiorImages !== undefined) property.interiorImages = dto.interiorImages;
-    if (dto.exteriorImages !== undefined) property.exteriorImages = dto.exteriorImages;
-    if (dto.streetImages !== undefined) property.streetImages = dto.streetImages;
-    if (dto.walkthroughVideo !== undefined) property.walkthroughVideo = dto.walkthroughVideo;
+    if (dto.proofOfOwnership !== undefined)
+      property.proofOfOwnership = dto.proofOfOwnership;
+    if (dto.interiorImages !== undefined)
+      property.interiorImages = dto.interiorImages;
+    if (dto.exteriorImages !== undefined)
+      property.exteriorImages = dto.exteriorImages;
+    if (dto.streetImages !== undefined)
+      property.streetImages = dto.streetImages;
+    if (dto.walkthroughVideo !== undefined)
+      property.walkthroughVideo = dto.walkthroughVideo;
 
     return this.propertyRepo.update(property);
   }
 
   async deleteProperty(id: string, ownerId: string) {
     const property = await this.propertyRepo.findById(id);
-    if (!property) throw new CustomError("Property not found", 404);
-    if (property.ownerId !== ownerId) throw new CustomError("You can only delete your own listings", 403);
+    if (!property) throw new CustomError('Property not found', 404);
+    if (property.ownerId !== ownerId)
+      throw new CustomError('You can only delete your own listings', 403);
 
     await this.propertyRepo.delete(id);
   }
@@ -102,7 +128,9 @@ export class PropertyService {
       maxPrice: query.maxPrice,
       bedrooms: query.bedrooms,
       bathrooms: query.bathrooms,
-      amenities: query.amenities ? query.amenities.split(",").map(a => a.trim()) : undefined,
+      amenities: query.amenities
+        ? query.amenities.split(',').map(a => a.trim())
+        : undefined,
       isAvailable: true,
       page: query.page,
       limit: query.limit,

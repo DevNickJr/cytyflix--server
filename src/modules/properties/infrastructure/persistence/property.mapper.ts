@@ -1,5 +1,5 @@
-import { Property, PropertyType, ListingType } from "../../domain/property";
-import { PropertyOrmEntity } from "./property.orm-entity";
+import { Property, PropertyType, ListingType } from '../../domain/property';
+import { PropertyOrmEntity } from './property.orm-entity';
 
 export class PropertyMapper {
   static toDomain(entity: PropertyOrmEntity): Property {
@@ -10,6 +10,8 @@ export class PropertyMapper {
       entity.propertyType as PropertyType,
       entity.listingType as ListingType,
       Number(entity.price),
+      entity.pricePeriod,
+      entity.negotiable,
       entity.currency,
       entity.address,
       entity.city,
@@ -25,14 +27,14 @@ export class PropertyMapper {
       entity.interiorImages || [],
       entity.exteriorImages || [],
       entity.streetImages || [],
-      entity.walkthroughVideo || "",
+      entity.walkthroughVideo || '',
       entity.isAvailable,
       entity.isFeatured,
       entity.isFrozen ?? false,
       entity.frozenReason,
       entity.ownerId,
       entity.createdAt,
-      entity.updatedAt,
+      entity.updatedAt
     );
   }
 

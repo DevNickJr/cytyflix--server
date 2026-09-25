@@ -1,15 +1,24 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, DeleteDateColumn } from "typeorm";
-import { UserOrmEntity } from "@/modules/users/infrastructure/persistence/user.orm-entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  DeleteDateColumn,
+} from 'typeorm';
+import { UserOrmEntity } from '@/modules/users/infrastructure/persistence/user.orm-entity';
 
-@Entity("properties")
+@Entity('properties')
 export class PropertyOrmEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column()
   title!: string;
 
-  @Column({ type: "text" })
+  @Column({ type: 'text' })
   description!: string;
 
   @Column()
@@ -18,10 +27,16 @@ export class PropertyOrmEntity {
   @Column()
   listingType!: string;
 
-  @Column({ type: "decimal" })
+  @Column({ type: 'decimal' })
   price!: number;
 
-  @Column({ default: "NGN" })
+  @Column({ type: 'varchar', default: 'month' })
+  pricePeriod!: string;
+
+  @Column({ type: 'boolean', default: false })
+  negotiable!: boolean;
+
+  @Column({ default: 'NGN' })
   currency!: string;
 
   @Column()
@@ -29,44 +44,44 @@ export class PropertyOrmEntity {
 
   @Column()
   city!: string; // city or ward
-  
+
   @Column({ nullable: false })
   lga!: string;
 
   @Column()
   state!: string;
 
-  @Column({ default: "Nigeria" })
+  @Column({ default: 'Nigeria' })
   country!: string;
 
-  @Column({ type: "decimal", precision: 10, scale: 7, nullable: true })
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
   latitude?: number;
 
-  @Column({ type: "decimal", precision: 10, scale: 7, nullable: true })
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
   longitude?: number;
 
-  @Column({ type: "int", default: 1 })
+  @Column({ type: 'int', default: 1 })
   bedrooms!: number;
 
-  @Column({ type: "int", default: 1 })
+  @Column({ type: 'int', default: 1 })
   bathrooms!: number;
 
-  @Column({ type: "jsonb", default: "[]" })
+  @Column({ type: 'jsonb', default: '[]' })
   amenities!: string[];
 
-  @Column({ type: "jsonb", default: "[]" })
+  @Column({ type: 'jsonb', default: '[]' })
   proofOfOwnership!: string[];
 
-  @Column({ type: "jsonb", default: "[]" })
+  @Column({ type: 'jsonb', default: '[]' })
   interiorImages!: string[];
 
-  @Column({ type: "jsonb", default: "[]" })
+  @Column({ type: 'jsonb', default: '[]' })
   exteriorImages!: string[];
 
-  @Column({ type: "jsonb", default: "[]" })
+  @Column({ type: 'jsonb', default: '[]' })
   streetImages!: string[];
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: 'text', nullable: true })
   walkthroughVideo?: string;
 
   @Column({ default: true })
@@ -78,14 +93,14 @@ export class PropertyOrmEntity {
   @Column({ default: false })
   isFrozen!: boolean;
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: 'text', nullable: true })
   frozenReason?: string;
 
   @Column()
   ownerId!: string;
 
   @ManyToOne(() => UserOrmEntity)
-  @JoinColumn({ name: "ownerId" })
+  @JoinColumn({ name: 'ownerId' })
   owner!: UserOrmEntity;
 
   @CreateDateColumn()

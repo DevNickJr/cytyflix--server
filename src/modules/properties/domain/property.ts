@@ -1,15 +1,15 @@
 export enum PropertyType {
-  APARTMENT = "apartment",
-  HOUSE = "house",
-  STUDIO = "studio",
-  DUPLEX = "duplex",
-  SELF_CONTAIN = "self_contain",
-  SHARED = "shared",
+  APARTMENT = 'apartment',
+  HOUSE = 'house',
+  STUDIO = 'studio',
+  DUPLEX = 'duplex',
+  SELF_CONTAIN = 'self_contain',
+  SHARED = 'shared',
 }
 
 export enum ListingType {
-  RENT = "rent",
-  SHORTLET = "shortlet",
+  RENT = 'rent',
+  SHORTLET = 'shortlet',
 }
 
 export class Property {
@@ -20,12 +20,14 @@ export class Property {
     public propertyType: PropertyType,
     public listingType: ListingType,
     public price: number,
-    public currency: string = "NGN",
+    public pricePeriod: string,
+    public negotiable: boolean,
+    public currency: string = 'NGN',
     public address: string,
     public city: string,
     public lga: string,
     public state: string,
-    public country: string = "Nigeria",
+    public country: string = 'Nigeria',
     public latitude?: number,
     public longitude?: number,
     public bedrooms: number = 1,
@@ -35,13 +37,13 @@ export class Property {
     public interiorImages: string[] = [],
     public exteriorImages: string[] = [],
     public streetImages: string[] = [],
-    public walkthroughVideo: string = "",
+    public walkthroughVideo: string = '',
     public isAvailable: boolean = true,
     public isFeatured: boolean = false,
     public isFrozen: boolean = false,
     public frozenReason?: string,
-    public ownerId: string = "",
+    public ownerId: string = '',
     public createdAt: Date = new Date(),
-    public updatedAt: Date = new Date(),
+    public updatedAt: Date = new Date()
   ) {}
 }
