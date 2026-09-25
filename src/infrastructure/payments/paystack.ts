@@ -25,7 +25,7 @@ export interface PaystackVerifyResponse {
     reference: string;
     amount: number;
     currency: string;
-    metadata: Record<string, object>;
+    metadata: Record<string, unknown>;
   };
 }
 
@@ -33,7 +33,7 @@ export async function initializeTransaction(
   email: string,
   amount: number,
   reference: string,
-  metadata: Record<string, object> = {}
+  metadata: Record<string, unknown> = {}
 ): Promise<PaystackInitResponse> {
   try {
     const response = await paystackClient.post('/transaction/initialize', {
