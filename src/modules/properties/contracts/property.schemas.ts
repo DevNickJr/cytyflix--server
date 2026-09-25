@@ -47,7 +47,8 @@ export const CreatePropertySchema = z.object({
     walkthroughVideo: z
       .string()
       .url('Valid walkthrough video URL is required')
-      .optional(),
+      .optional()
+      .or(z.literal('')),
   }),
 });
 
