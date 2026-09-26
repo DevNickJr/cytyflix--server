@@ -4,6 +4,8 @@ import { AuthGuard } from '@/shared/middlewares/auth.middleware';
 import validateRequest from '@/shared/middlewares/validate-request';
 import {
   CreateReviewSchema,
+  IdAndPropertyIdParam,
+  PropertyIdParam,
   UpdateReviewSchema,
 } from '../contracts/review.schemas';
 
@@ -13,7 +15,7 @@ export const reviewRoutes = (controller: ReviewController) => {
   router.post(
     '/:propertyId/reviews',
     AuthGuard,
-    validateRequest([CreateReviewSchema]),
+    validateRequest([PropertyIdParam, CreateReviewSchema]),
     controller.create
   );
 
@@ -24,7 +26,7 @@ export const reviewRoutes = (controller: ReviewController) => {
   router.patch(
     '/:propertyId/reviews/:id',
     AuthGuard,
-    validateRequest([UpdateReviewSchema]),
+    validateRequest([IdAndPropertyIdParam, UpdateReviewSchema]),
     controller.update
   );
 

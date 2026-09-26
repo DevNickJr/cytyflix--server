@@ -8,6 +8,7 @@ import {
   ReviewReportSchema,
 } from '../contracts/report.schemas';
 import { PaginationQuerySchema, IdParam } from '@/shared/schemas';
+import { PropertyIdParam } from '@/modules/reviews/contracts/review.schemas';
 
 export const reportPropertyRoutes = (controller: ReportController) => {
   const router = Router();
@@ -15,7 +16,7 @@ export const reportPropertyRoutes = (controller: ReportController) => {
   router.post(
     '/:propertyId/reports',
     AuthGuard,
-    validateRequest([CreateReportSchema]),
+    validateRequest([PropertyIdParam, CreateReportSchema]),
     controller.create
   );
 

@@ -1,4 +1,4 @@
-import z from 'zod';
+import z, { property } from 'zod';
 
 export const CreateReviewSchema = z.object({
   body: z.object({
@@ -33,3 +33,22 @@ export const UpdateReviewSchema = z.object({
 });
 
 export type UpdateReviewDTO = z.infer<typeof UpdateReviewSchema>['body'];
+
+export const PropertyIdParam = z.object({
+  params: z.object({
+    propertyId: z.string().min(1, { error: 'propertyId must be a string' }),
+  }),
+});
+
+export type PropertyIdParamDTO = z.infer<typeof PropertyIdParam>['params'];
+
+export const IdAndPropertyIdParam = z.object({
+  params: z.object({
+    id: z.string().min(1, { error: 'Id must be a string' }),
+    propertyId: z.string().min(1, { error: 'propertyId must be a string' }),
+  }),
+});
+
+export type IdAndPropertyIdParamDTO = z.infer<
+  typeof IdAndPropertyIdParam
+>['params'];
