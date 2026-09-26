@@ -1,4 +1,4 @@
-import z, { property } from 'zod';
+import z from 'zod';
 
 export const CreateReviewSchema = z.object({
   body: z.object({
