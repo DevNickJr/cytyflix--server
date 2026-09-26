@@ -2,10 +2,18 @@ import z from 'zod';
 
 export const CreateRentPaymentSchema = z.object({
   body: z.object({
-    propertyId: z.string().min(1),
-    ownerId: z.string().min(1),
-    amount: z.number().positive(),
-    moveInDate: z.string().min(1),
+    propertyId: z
+      .string({ error: 'Property ID is required' })
+      .min(1, { error: 'Property ID is required' }),
+    ownerId: z
+      .string({ error: 'Owner ID is required' })
+      .min(1, { error: 'Owner ID is required' }),
+    amount: z
+      .number({ error: 'Amount is required' })
+      .positive({ error: 'Amount must be a positive number' }),
+    moveInDate: z
+      .string({ error: 'Move in date is required' })
+      .min(1, { error: 'Move in date is required' }),
   }),
 });
 
